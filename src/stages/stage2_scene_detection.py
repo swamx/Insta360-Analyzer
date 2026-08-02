@@ -202,12 +202,24 @@ class Stage2SceneDetection(Stage):
         return result
 
     def _detect_scenes_fallback(self, video_path: Path) -> List[tuple]:
-        """Fallback scene detection: split by fixed duration."""
+        """Fallback scene detection: split by fixed duration or estimate from file size."""
         try:
             duration = self._get_video_duration(video_path)
 
+            # If duration detection fails, estimate from file size
             if duration <= 0:
-                return []
+                try:
+                    file_size_gb = video_path.stat().st_size / (1024**3)
+                    # Rough estimate: Insta360 videos ~200MB per minute at 4K
+                    # So 1GB ≈ 5 minutes
+                    estimated_duration = file_size_gb * 300  # seconds
+                    logger.warning(f"Estimated video duration from file size: {estimated_duration:.1f}s ({estimated_duration/60:.1f} minutes)")
+                    duration = estimated_duration
+                except Exception as e:
+                    logger.warning(f"Could not estimate duration: {str(e)}")
+                    # Default to 10 minute video if all else fails
+                    duration = 600
+                    logger.info(f"Using default 10-minute duration estimate")
 
             scenes = []
             chunk_duration = 5.0  # 5-second chunks
