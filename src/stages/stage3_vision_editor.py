@@ -11,6 +11,7 @@ from PIL import Image
 from src.stages.base import Stage, StageResult, ProgressInfo
 from src.storage.checkpoint_manager import CheckpointManager
 from src.utils.logger import get_logger
+from src.analytics import SceneAnalyzer, TraceabilityLogger
 
 try:
     import torch
@@ -37,6 +38,10 @@ class Stage3VisionEditor(Stage):
         self.model_name = model_name
         self.model = None
         self.processor = None
+
+        # Initialize analytics
+        self.scene_analyzer = SceneAnalyzer()
+        self.traceability = None  # Initialized per file
 
     def _load_model(self) -> None:
         """Load Qwen2.5-VL model."""
@@ -115,6 +120,10 @@ class Stage3VisionEditor(Stage):
         try:
             self._load_model()
 
+            # Initialize traceability for this file
+            working_dir = Path("data/working")
+            self.traceability = TraceabilityLogger(working_dir / self.stage_name)
+
             # Get scenes from Stage 2
             scenes = scenes_checkpoint.get("scenes", [])
 
@@ -150,6 +159,59 @@ class Stage3VisionEditor(Stage):
 
                 score = self._score_scene(scene)
                 scene.update(score)
+
+                # Run frame analysis if keyframe exists
+                key_frame_path = scene.get("key_frame_path")
+                if key_frame_path and Path(key_frame_path).exists():
+                    frame_analysis = self.scene_analyzer.analyze_frame(Path(key_frame_path))
+                    if frame_analysis:
+                        # Log subject detection
+                        if self.traceability:
+                            self.traceability.log_subject_detection(
+                                scene_id=f"scene_{scene_idx}",
+                                frame_path=key_frame_path,
+                                has_subjects=frame_analysis.has_humans,
+                                subject_count=frame_analysis.human_count,
+                                confidence=frame_analysis.human_confidence,
+                                quality_metrics={
+                                    "sharpness": frame_analysis.analysis_metadata.get("sharpness_score"),
+                                    "brightness": frame_analysis.brightness,
+                                    "contrast": frame_analysis.contrast,
+                                }
+                            )
+
+                            # Log scenery analysis
+                            self.traceability.log_scenery_analysis(
+                                scene_id=f"scene_{scene_idx}",
+                                frame_path=key_frame_path,
+                                scenery_score=frame_analysis.scenery_quality,
+                                composition_score=frame_analysis.composition_score,
+                                dominant_colors=frame_analysis.dominant_colors,
+                                brightness=frame_analysis.brightness,
+                                contrast=frame_analysis.contrast,
+                            )
+
+                        # Add analytics to scene
+                        scene["analytics"] = {
+                            "has_subjects": frame_analysis.has_humans,
+                            "subject_count": frame_analysis.human_count,
+                            "scenery_quality": frame_analysis.scenery_quality,
+                            "composition_score": frame_analysis.composition_score,
+                        }
+
+                # Log scene scoring to traceability
+                if self.traceability:
+                    self.traceability.log_scene_scoring(
+                        scene_id=f"scene_{scene_idx}",
+                        beauty_score=score.get("scenic_beauty", 5),
+                        action_score=score.get("action", 5),
+                        emotion_score=score.get("emotion", 5),
+                        stability_score=score.get("stability", 5),
+                        clarity_score=score.get("blurriness", 5),
+                        overall_score=score.get("overall_score", 5),
+                        rationale=score.get("brief_description", ""),
+                    )
+
                 scored_scenes.append(scene)
 
                 # Save checkpoint after each scene
@@ -183,6 +245,12 @@ class Stage3VisionEditor(Stage):
                 datetime.utcnow().isoformat() + "Z"
             )
             self.checkpoint_manager.save_file_metadata(file_id, metadata)
+
+            # Save traceability reports
+            if self.traceability:
+                self.traceability.save_report(file_id)
+                self.traceability.generate_markdown_report(file_id)
+                logger.info("Traceability reports saved")
 
             self._log_stage_complete(file_id)
             return StageResult(
