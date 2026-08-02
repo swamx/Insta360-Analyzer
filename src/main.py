@@ -74,6 +74,13 @@ def create_parser():
         help="Enable verbose logging",
     )
 
+    parser.add_argument(
+        "--max-duration",
+        type=float,
+        default=15.0,
+        help="Maximum reel duration in seconds (default: 15.0, set to 0 for unlimited)",
+    )
+
     return parser
 
 
@@ -213,7 +220,14 @@ def main():
     if args.checkpoint_dir is None:
         args.checkpoint_dir = args.data_dir / "working" / "checkpoints"
 
-    pipeline = Pipeline(args.checkpoint_dir, args.data_dir)
+    # Determine max duration (0 = unlimited, use very large number)
+    max_duration = 3600.0 if args.max_duration == 0 else args.max_duration
+
+    pipeline = Pipeline(
+        args.checkpoint_dir,
+        args.data_dir,
+        max_reel_duration_seconds=max_duration,
+    )
 
     # Handle list-files
     if args.list_files:

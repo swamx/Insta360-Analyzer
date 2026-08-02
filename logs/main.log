@@ -38,3 +38,87 @@
 2026-08-02 16:07:08 - insta360_analyzer - INFO - [main.py:181] - Success: False
 2026-08-02 16:07:08 - insta360_analyzer - ERROR - [main.py:191] - Error: Stage 2 failed: No scenes detected
 2026-08-02 16:07:08 - insta360_analyzer - INFO - [main.py:193] - ============================================================
+2026-08-02 16:08:23 - insta360_analyzer.pipeline - INFO - [pipeline.py:48] - Pipeline initialized (checkpoint_dir=data\working\checkpoints, data_dir=data)
+2026-08-02 16:08:23 - insta360_analyzer - INFO - [main.py:170] - ============================================================
+2026-08-02 16:08:23 - insta360_analyzer - INFO - [main.py:171] - PROCESSING: file_VID_20250727_170303_00_033_1753650286010000000
+2026-08-02 16:08:23 - insta360_analyzer - INFO - [main.py:172] - Input: C:\Users\swamx\OneDrive\Documents\Camera01\VID_20250727_170303_00_033.insv
+2026-08-02 16:08:23 - insta360_analyzer - INFO - [main.py:173] - Resume: False
+2026-08-02 16:08:23 - insta360_analyzer - INFO - [main.py:174] - ============================================================
+2026-08-02 16:08:23 - insta360_analyzer.pipeline - INFO - [logger.py:79] - [file_VID_20250727_170303_00_033_1753650286010000000] Starting processing (resume=False)
+2026-08-02 16:08:23 - insta360_analyzer.pipeline - INFO - [logger.py:79] - [file_VID_20250727_170303_00_033_1753650286010000000] Running Stage 1: Discovery
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage1_discovery - INFO - [base.py:100] - [file_VID_20250727_170303_00_033_1753650286010000000] Starting stage1_discovery
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage1_discovery - INFO - [base.py:104] - [file_VID_20250727_170303_00_033_1753650286010000000] Completed stage1_discovery
+2026-08-02 16:08:23 - insta360_analyzer.pipeline - INFO - [logger.py:79] - [file_VID_20250727_170303_00_033_1753650286010000000] Running Stage 2: Scene Detection
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage2_scene_detection - INFO - [base.py:100] - [file_VID_20250727_170303_00_033_1753650286010000000] Starting stage2_scene_detection
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:146] - PySceneDetect not available, using fallback detection
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage2_scene_detection - ERROR - [stage2_scene_detection.py:306] - Could not get video duration: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:216] - Estimated video duration from file size: 305.3s (5.1 minutes)
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage2_scene_detection - INFO - [stage2_scene_detection.py:63] - [file_VID_20250727_170303_00_033_1753650286010000000] Detected 62 scenes
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:24 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:24 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:24 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:24 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:24 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:24 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:24 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:24 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:24 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:24 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:24 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:24 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:24 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:24 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:24 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:24 - insta360_analyzer - INFO - [main.py:178] - ============================================================
+2026-08-02 16:08:24 - insta360_analyzer - INFO - [main.py:179] - RESULTS
+2026-08-02 16:08:24 - insta360_analyzer - INFO - [main.py:180] - ============================================================
+2026-08-02 16:08:24 - insta360_analyzer - INFO - [main.py:181] - Success: False
+2026-08-02 16:08:24 - insta360_analyzer - ERROR - [main.py:191] - Error: Stage 2 failed: Failed to extract key frames
+2026-08-02 16:08:24 - insta360_analyzer - INFO - [main.py:193] - ============================================================

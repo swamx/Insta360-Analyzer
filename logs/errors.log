@@ -2,3 +2,5 @@
 2026-08-02 16:02:55 - insta360_analyzer - ERROR - [main.py:191] - Error: Stage 2 failed: No scenes detected
 2026-08-02 16:07:08 - insta360_analyzer.stages.stage2_scene_detection - ERROR - [stage2_scene_detection.py:294] - Could not get video duration: [WinError 2] The system cannot find the file specified
 2026-08-02 16:07:08 - insta360_analyzer - ERROR - [main.py:191] - Error: Stage 2 failed: No scenes detected
+2026-08-02 16:08:23 - insta360_analyzer.stages.stage2_scene_detection - ERROR - [stage2_scene_detection.py:306] - Could not get video duration: [WinError 2] The system cannot find the file specified
+2026-08-02 16:08:24 - insta360_analyzer - ERROR - [main.py:191] - Error: Stage 2 failed: Failed to extract key frames

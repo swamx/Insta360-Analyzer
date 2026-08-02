@@ -1,4 +1,4 @@
-"""Stage 4: Reel Assembly - Create optimal 15-second reel."""
+"""Stage 4: Reel Assembly - Create optimal reel (configurable duration)."""
 
 import json
 import re

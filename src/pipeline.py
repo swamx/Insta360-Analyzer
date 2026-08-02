@@ -23,11 +23,13 @@ class Pipeline:
         self,
         checkpoint_dir: Path,
         data_dir: Path,
+        max_reel_duration_seconds: float = 15.0,
     ):
         self.checkpoint_dir = Path(checkpoint_dir)
         self.data_dir = Path(data_dir)
         self.working_dir = self.data_dir / "working"
         self.output_dir = self.data_dir / "output"
+        self.max_reel_duration_seconds = max_reel_duration_seconds
 
         # Create directories
         self.checkpoint_dir.mkdir(parents=True, exist_ok=True)
@@ -42,7 +44,10 @@ class Pipeline:
         self.stage1 = Stage1Discovery(self.checkpoint_manager)
         self.stage2 = Stage2SceneDetection(self.checkpoint_manager)
         self.stage3 = Stage3VisionEditor(self.checkpoint_manager)
-        self.stage4 = Stage4ReelAssembly(self.checkpoint_manager)
+        self.stage4 = Stage4ReelAssembly(
+            self.checkpoint_manager,
+            max_duration_seconds=max_reel_duration_seconds,
+        )
         self.stage5 = Stage5Encoding(self.checkpoint_manager)
 
         logger.info(
