@@ -166,6 +166,66 @@ For long-running stages (analysis, encoding):
 3. On restart: Detects incomplete stage, resumes from `last_completed_frame + 1`
 4. No re-processing of already-completed frames
 
+## 2.5 Insta360 Format Handling
+
+### Format Support
+
+The analyzer natively supports Insta360 formats:
+
+- `.insv` - Insta360 spherical video (raw 360)
+- `.insp` - Insta360 spherical photo (360 image)
+- `.lrv` - Low-resolution preview video
+
+### Stitching Pipeline
+
+Insta360 formats require stitching before standard processing:
+
+```
+Input (.insv)
+    ↓ [Stitcher: Studio/OneX/FFmpeg]
+Equirectangular MP4 (360° video)
+    ↓ [Frame Extraction]
+Extracted frames (720p JPEG)
+    ↓ [Vision Analysis]
+[Continues through stages 3-5]
+```
+
+### Tool Detection & Fallback
+
+**Stage 2** automatically:
+
+1. Detects Insta360 format (file extension check)
+2. Checks available stitching tools in order:
+   - Insta360 Studio (preferred, highest quality)
+   - Insta360 OneX API (if available)
+   - FFmpeg with insta360 filter (community option)
+3. Converts to standard MP4 using best available tool
+4. Continues with normal frame extraction
+
+**If no stitcher available:** Stage 2 fails with clear message to install Studio.
+
+### Installation & Detection
+
+See `docs/SETUP.md` for detailed installation instructions.
+
+Run tool detection:
+
+```bash
+python scripts/detect_insta360_tools.py
+```
+
+This will show:
+
+- Available tools on your system
+- Preferred tool selection
+- Installation instructions if tools missing
+
+### Performance Implications
+
+- **Stitching time:** 30min-2hrs for 1-hour Insta360 video (depends on resolution)
+- **Output size:** Equirectangular MP4 typically 1.5-2GB per hour
+- **Storage:** Stitched video is temp (deleted after frame extraction if configured)
+
 ## 3. FILE STRUCTURE & STORAGE LAYOUT
 
 ```

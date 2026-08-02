@@ -7,6 +7,7 @@ from typing import Optional
 
 from src.stages.base import Stage, StageResult, ProgressInfo
 from src.storage.checkpoint_manager import CheckpointManager
+from src.processing.insta360_converter import Insta360Converter
 from src.utils.logger import get_logger
 
 
@@ -20,6 +21,7 @@ class Stage2Extraction(Stage):
         super().__init__("stage2_extraction")
         self.checkpoint_manager = checkpoint_manager
         self.frame_interval = frame_interval  # Extract frame every N seconds
+        self.insta360_converter = Insta360Converter()
 
     def run(
         self,
@@ -33,7 +35,7 @@ class Stage2Extraction(Stage):
 
         Args:
             file_id: Unique identifier for this file
-            input_path: Path to input video
+            input_path: Path to input video (standard or Insta360 format)
             output_dir: Directory to save extracted frames
             resume_from: Ignored for frame extraction (always re-extracts)
 
@@ -47,13 +49,48 @@ class Stage2Extraction(Stage):
             output_dir = Path(output_dir) / file_id / "frames"
             output_dir.mkdir(parents=True, exist_ok=True)
 
+            # Check if input is Insta360 format and convert if needed
+            video_path = input_path
+            if self.insta360_converter.is_insta360_format(input_path):
+                logger.info(
+                    f"[{file_id}] Detected Insta360 format ({input_path.suffix}), "
+                    "converting to MP4..."
+                )
+
+                if not self.insta360_converter.can_convert(input_path):
+                    return StageResult(
+                        success=False,
+                        stage_name=self.stage_name,
+                        file_id=file_id,
+                        message=(
+                            "Insta360 format detected but no stitching tool available. "
+                            "See SETUP.md for installation instructions."
+                        ),
+                    )
+
+                converted_path = output_dir.parent / "converted.mp4"
+                success, message = self.insta360_converter.convert_to_mp4(
+                    input_path, converted_path
+                )
+
+                if not success:
+                    return StageResult(
+                        success=False,
+                        stage_name=self.stage_name,
+                        file_id=file_id,
+                        message=f"Insta360 conversion failed: {message}",
+                    )
+
+                logger.info(f"[{file_id}] Conversion complete: {message}")
+                video_path = converted_path
+
             # Use FFmpeg to extract frames
             frame_pattern = str(output_dir / "frame_%06d.jpg")
 
             # FFmpeg command: extract frames every N seconds
             cmd = [
                 "ffmpeg",
-                "-i", str(input_path),
+                "-i", str(video_path),
                 "-vf", f"fps=1/{self.frame_interval}",
                 "-q:v", "2",  # Quality (1-31, lower is better)
                 frame_pattern,
