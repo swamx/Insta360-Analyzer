@@ -162,8 +162,11 @@ class Stage3Analysis(Stage):
                 f"[{file_id}] Found {total_frames} frames to analyze"
             )
 
-            # Determine start index
+            # Determine start index and load existing checkpoint
             start_idx = 0
+            all_embeddings = []
+            all_analysis = []
+
             if resume_from is not None:
                 start_idx = resume_from
                 logger.info(f"[{file_id}] Resuming from frame {start_idx}")
@@ -173,18 +176,19 @@ class Stage3Analysis(Stage):
                     checkpoint = self.checkpoint_manager.load_file_checkpoint(
                         file_id, self.stage_name
                     )
+                    # Load existing embeddings and analysis
+                    all_embeddings = checkpoint.get("embeddings", [])
+                    all_analysis = checkpoint.get("analysis", [])
+
                     stage_progress = checkpoint.get("stage_progress", {}).get(
                         self.stage_name
                     )
                     if stage_progress:
                         start_idx = stage_progress.get("last_completed_frame", -1) + 1
                         logger.info(
-                            f"[{file_id}] Found partial checkpoint, resuming from frame {start_idx}"
+                            f"[{file_id}] Found partial checkpoint with {len(all_embeddings)} "
+                            f"embeddings, resuming from frame {start_idx}"
                         )
-
-            # Analyze frames
-            all_embeddings = []
-            all_analysis = []
 
             for batch_start in range(start_idx, total_frames, self.batch_size):
                 batch_end = min(batch_start + self.batch_size, total_frames)
