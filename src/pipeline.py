@@ -7,7 +7,10 @@ from src.utils.logger import get_logger, ContextualLogger
 from src.storage.checkpoint_manager import CheckpointManager
 from src.recovery import RecoveryManager
 from src.stages.stage1_discovery import Stage1Discovery
-from src.stages.stage2_extraction import Stage2Extraction
+from src.stages.stage2_scene_detection import Stage2SceneDetection
+from src.stages.stage3_vision_editor import Stage3VisionEditor
+from src.stages.stage4_reel_assembly import Stage4ReelAssembly
+from src.stages.stage5_encoding import Stage5Encoding
 
 
 logger = get_logger("pipeline")
@@ -37,7 +40,10 @@ class Pipeline:
 
         # Initialize stages
         self.stage1 = Stage1Discovery(self.checkpoint_manager)
-        self.stage2 = Stage2Extraction(self.checkpoint_manager, frame_interval=2.0)
+        self.stage2 = Stage2SceneDetection(self.checkpoint_manager)
+        self.stage3 = Stage3VisionEditor(self.checkpoint_manager)
+        self.stage4 = Stage4ReelAssembly(self.checkpoint_manager)
+        self.stage5 = Stage5Encoding(self.checkpoint_manager)
 
         logger.info(
             f"Pipeline initialized (checkpoint_dir={self.checkpoint_dir}, "
@@ -97,15 +103,11 @@ class Pipeline:
                 ctx_logger.info("Stage 1: Discovery (skipped - already complete)")
                 results["stages"]["stage1_discovery"] = {"success": True, "skipped": True}
 
-            # Stage 2: Frame Extraction
+            # Stage 2: Scene Detection
             if not resume or recovery_state.next_stage_to_run <= 1:
-                ctx_logger.info("Running Stage 2: Frame Extraction")
-                result = self.stage2.run(
-                    file_id,
-                    input_path,
-                    self.working_dir,
-                )
-                results["stages"]["stage2_extraction"] = {
+                ctx_logger.info("Running Stage 2: Scene Detection")
+                result = self.stage2.run(file_id, input_path)
+                results["stages"]["stage2_scene_detection"] = {
                     "success": result.success,
                     "message": result.message,
                     "data": result.data,
@@ -113,16 +115,64 @@ class Pipeline:
                 if not result.success:
                     results["error"] = f"Stage 2 failed: {result.message}"
                     return results
+                stage2_data = result.data
             else:
-                ctx_logger.info("Stage 2: Frame Extraction (skipped - already complete)")
-                results["stages"]["stage2_extraction"] = {"success": True, "skipped": True}
+                ctx_logger.info("Stage 2: Scene Detection (skipped - already complete)")
+                results["stages"]["stage2_scene_detection"] = {"success": True, "skipped": True}
+                # Load checkpoint for next stage
+                stage2_cp = self.checkpoint_manager.load_file_checkpoint(file_id, "stage2_scene_detection")
+                stage2_data = {"scene_count": stage2_cp.get("total_scenes", 0)}
 
-            # Stages 3-5 placeholders
-            # TODO: Implement in Phase 0
-            ctx_logger.info("Stages 3-5: Placeholder (not yet implemented)")
-            results["stages"]["stage3_analysis"] = {"success": True, "placeholder": True}
-            results["stages"]["stage4_highlights"] = {"success": True, "placeholder": True}
-            results["stages"]["stage5_encoding"] = {"success": True, "placeholder": True}
+            # Stage 3: Vision Editor
+            if not resume or recovery_state.next_stage_to_run <= 2:
+                ctx_logger.info("Running Stage 3: Vision Editor")
+                stage2_cp = self.checkpoint_manager.load_file_checkpoint(file_id, "stage2_scene_detection")
+                result = self.stage3.run(file_id, stage2_cp)
+                results["stages"]["stage3_vision_editor"] = {
+                    "success": result.success,
+                    "message": result.message,
+                    "data": result.data,
+                }
+                if not result.success:
+                    results["error"] = f"Stage 3 failed: {result.message}"
+                    return results
+            else:
+                ctx_logger.info("Stage 3: Vision Editor (skipped - already complete)")
+                results["stages"]["stage3_vision_editor"] = {"success": True, "skipped": True}
+
+            # Stage 4: Reel Assembly
+            if not resume or recovery_state.next_stage_to_run <= 3:
+                ctx_logger.info("Running Stage 4: Reel Assembly")
+                stage3_cp = self.checkpoint_manager.load_file_checkpoint(file_id, "stage3_vision_editor")
+                result = self.stage4.run(file_id, stage3_cp)
+                results["stages"]["stage4_reel_assembly"] = {
+                    "success": result.success,
+                    "message": result.message,
+                    "data": result.data,
+                }
+                if not result.success:
+                    results["error"] = f"Stage 4 failed: {result.message}"
+                    return results
+            else:
+                ctx_logger.info("Stage 4: Reel Assembly (skipped - already complete)")
+                results["stages"]["stage4_reel_assembly"] = {"success": True, "skipped": True}
+
+            # Stage 5: Encoding
+            if not resume or recovery_state.next_stage_to_run <= 4:
+                ctx_logger.info("Running Stage 5: Encoding")
+                stage4_cp = self.checkpoint_manager.load_file_checkpoint(file_id, "stage4_reel_assembly")
+                result = self.stage5.run(file_id, input_path, stage4_cp)
+                results["stages"]["stage5_encoding"] = {
+                    "success": result.success,
+                    "message": result.message,
+                    "data": result.data,
+                }
+                if not result.success:
+                    results["error"] = f"Stage 5 failed: {result.message}"
+                    return results
+            else:
+                ctx_logger.info("Stage 5: Encoding (skipped - already complete)")
+                results["stages"]["stage5_encoding"] = {"success": True, "skipped": True}
 
             results["success"] = True
             ctx_logger.info("Processing complete")
