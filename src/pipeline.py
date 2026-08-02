@@ -6,6 +6,7 @@ from typing import Optional
 from src.utils.logger import get_logger, ContextualLogger
 from src.storage.checkpoint_manager import CheckpointManager
 from src.recovery import RecoveryManager
+from src.stages.stage0_insta360_conversion import Stage0Insta360Conversion
 from src.stages.stage1_discovery import Stage1Discovery
 from src.stages.stage2_scene_detection import Stage2SceneDetection
 from src.stages.stage3_vision_editor import Stage3VisionEditor
@@ -41,6 +42,7 @@ class Pipeline:
         self.recovery_manager = RecoveryManager(self.checkpoint_manager)
 
         # Initialize stages
+        self.stage0 = None  # Initialized per-file since it needs video_path
         self.stage1 = Stage1Discovery(self.checkpoint_manager)
         self.stage2 = Stage2SceneDetection(self.checkpoint_manager)
         self.stage3 = Stage3VisionEditor(self.checkpoint_manager)
@@ -93,10 +95,30 @@ class Pipeline:
                     f"next_to_run={recovery_state.next_stage_to_run}"
                 )
 
+            # Stage 0.5: Insta360 Conversion
+            processed_input_path = input_path
+            if not resume or recovery_state.next_stage_to_run <= -1:
+                ctx_logger.info("Running Stage 0.5: Insta360 Conversion")
+                self.stage0 = Stage0Insta360Conversion(input_path, self.working_dir)
+                result = self.stage0.run()
+                results["stages"]["stage0_insta360_conversion"] = {
+                    "success": True,
+                    "was_360": result.get("was_360", False),
+                    "conversion_applied": result.get("conversion_applied", False),
+                }
+                processed_input_path = Path(result.get("output_video", input_path))
+                ctx_logger.info(
+                    f"Stage 0.5 complete: was_360={result.get('was_360')}, "
+                    f"converted={result.get('conversion_applied')}"
+                )
+            else:
+                ctx_logger.info("Stage 0.5: Insta360 Conversion (skipped - already complete)")
+                results["stages"]["stage0_insta360_conversion"] = {"success": True, "skipped": True}
+
             # Stage 1: Discovery
             if not resume or recovery_state.next_stage_to_run <= 0:
                 ctx_logger.info("Running Stage 1: Discovery")
-                result = self.stage1.run(file_id, input_path)
+                result = self.stage1.run(file_id, processed_input_path)
                 results["stages"]["stage1_discovery"] = {
                     "success": result.success,
                     "message": result.message,
@@ -111,7 +133,7 @@ class Pipeline:
             # Stage 2: Scene Detection
             if not resume or recovery_state.next_stage_to_run <= 1:
                 ctx_logger.info("Running Stage 2: Scene Detection")
-                result = self.stage2.run(file_id, input_path)
+                result = self.stage2.run(file_id, processed_input_path)
                 results["stages"]["stage2_scene_detection"] = {
                     "success": result.success,
                     "message": result.message,
@@ -166,7 +188,7 @@ class Pipeline:
             if not resume or recovery_state.next_stage_to_run <= 4:
                 ctx_logger.info("Running Stage 5: Encoding")
                 stage4_cp = self.checkpoint_manager.load_file_checkpoint(file_id, "stage4_reel_assembly")
-                result = self.stage5.run(file_id, input_path, stage4_cp)
+                result = self.stage5.run(file_id, processed_input_path, stage4_cp)
                 results["stages"]["stage5_encoding"] = {
                     "success": result.success,
                     "message": result.message,
