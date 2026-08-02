@@ -1,0 +1,29 @@
+# Core ML framework
+torch==2.1.2
+torchvision==0.16.2
+transformers==4.36.2
+bitsandbytes==0.41.3.post2
+
+# Vision and processing
+opencv-python==4.8.1.78
+Pillow==10.0.1
+numpy==1.24.3
+
+# Data storage
+h5py==3.10.0
+pyyaml==6.0.1
+
+# Configuration
+pydantic==2.4.2
+
+# CLI and utilities
+click==8.1.7
+tqdm==4.66.1
+python-dotenv==1.0.0
+
+# Testing
+pytest==7.4.3
+pytest-cov==4.1.0
+
+# Logging
+python-json-logger==2.0.7
