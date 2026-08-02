@@ -1,0 +1,5 @@
+file 'data\working\file_VID_20250727_170303_00_033_1753650286010000000_clips\clip_000.mp4'
+file 'data\working\file_VID_20250727_170303_00_033_1753650286010000000_clips\clip_001.mp4'
+file 'data\working\file_VID_20250727_170303_00_033_1753650286010000000_clips\clip_002.mp4'
+file 'data\working\file_VID_20250727_170303_00_033_1753650286010000000_clips\clip_003.mp4'
+file 'data\working\file_VID_20250727_170303_00_033_1753650286010000000_clips\clip_004.mp4'

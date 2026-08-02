@@ -1,0 +1,14 @@
+{
+  "stage": "stage5_encoding",
+  "file_id": "file_VID_20250727_171002_00_044_1753650615010000000",
+  "clips_to_encode": 3,
+  "clips_encoded": 3,
+  "last_encoded_clip": 2,
+  "extracted_clips": [
+    "data\\working\\file_VID_20250727_171002_00_044_1753650615010000000_clips\\clip_000.mp4",
+    "data\\working\\file_VID_20250727_171002_00_044_1753650615010000000_clips\\clip_001.mp4",
+    "data\\working\\file_VID_20250727_171002_00_044_1753650615010000000_clips\\clip_002.mp4"
+  ],
+  "status": "IN_PROGRESS",
+  "timestamp": "2026-08-02T20:18:16.906760Z"
+}

@@ -1,0 +1,48 @@
+{
+  "stage": "stage4_reel_assembly",
+  "file_id": "file_VID_20250727_170303_00_033_1753650286010000000",
+  "reel_plan": {
+    "total_duration": 15.0,
+    "reasoning": "Selected top 5 scenes, total 15.0s",
+    "clips": [
+      {
+        "scene_id": "file_VID_20250727_170303_00_033_1753650286010000000_scene_004",
+        "start_ms": 20000,
+        "end_ms": 23000,
+        "clip_duration": 3.0,
+        "score": 8.2
+      },
+      {
+        "scene_id": "file_VID_20250727_170303_00_033_1753650286010000000_scene_003",
+        "start_ms": 15000,
+        "end_ms": 18000,
+        "clip_duration": 3.0,
+        "score": 7.4
+      },
+      {
+        "scene_id": "file_VID_20250727_170303_00_033_1753650286010000000_scene_002",
+        "start_ms": 10000,
+        "end_ms": 13000,
+        "clip_duration": 3.0,
+        "score": 6.6
+      },
+      {
+        "scene_id": "file_VID_20250727_170303_00_033_1753650286010000000_scene_001",
+        "start_ms": 5000,
+        "end_ms": 8000,
+        "clip_duration": 3.0,
+        "score": 5.8
+      },
+      {
+        "scene_id": "file_VID_20250727_170303_00_033_1753650286010000000_scene_006",
+        "start_ms": 30000,
+        "end_ms": 33000,
+        "clip_duration": 3.0,
+        "score": 5.8
+      }
+    ]
+  },
+  "total_duration_seconds": 15.0,
+  "clips_selected": 5,
+  "timestamp": "2026-08-02T20:19:47.927999Z"
+}

@@ -122,3 +122,115 @@
 2026-08-02 16:08:24 - insta360_analyzer - INFO - [main.py:181] - Success: False
 2026-08-02 16:08:24 - insta360_analyzer - ERROR - [main.py:191] - Error: Stage 2 failed: Failed to extract key frames
 2026-08-02 16:08:24 - insta360_analyzer - INFO - [main.py:193] - ============================================================
+2026-08-02 16:11:02 - insta360_analyzer.pipeline - INFO - [pipeline.py:48] - Pipeline initialized (checkpoint_dir=data\working\checkpoints, data_dir=data)
+2026-08-02 16:11:02 - insta360_analyzer - INFO - [main.py:170] - ============================================================
+2026-08-02 16:11:02 - insta360_analyzer - INFO - [main.py:171] - PROCESSING: file_VID_20250727_170303_00_033_1753650286010000000
+2026-08-02 16:11:02 - insta360_analyzer - INFO - [main.py:172] - Input: C:\Users\swamx\OneDrive\Documents\Camera01\VID_20250727_170303_00_033.insv
+2026-08-02 16:11:02 - insta360_analyzer - INFO - [main.py:173] - Resume: False
+2026-08-02 16:11:02 - insta360_analyzer - INFO - [main.py:174] - ============================================================
+2026-08-02 16:11:02 - insta360_analyzer.pipeline - INFO - [logger.py:79] - [file_VID_20250727_170303_00_033_1753650286010000000] Starting processing (resume=False)
+2026-08-02 16:11:02 - insta360_analyzer.pipeline - INFO - [logger.py:79] - [file_VID_20250727_170303_00_033_1753650286010000000] Running Stage 1: Discovery
+2026-08-02 16:11:02 - insta360_analyzer.stages.stage1_discovery - INFO - [base.py:100] - [file_VID_20250727_170303_00_033_1753650286010000000] Starting stage1_discovery
+2026-08-02 16:11:02 - insta360_analyzer.stages.stage1_discovery - INFO - [base.py:104] - [file_VID_20250727_170303_00_033_1753650286010000000] Completed stage1_discovery
+2026-08-02 16:11:02 - insta360_analyzer.pipeline - INFO - [logger.py:79] - [file_VID_20250727_170303_00_033_1753650286010000000] Running Stage 2: Scene Detection
+2026-08-02 16:11:02 - insta360_analyzer.stages.stage2_scene_detection - INFO - [base.py:100] - [file_VID_20250727_170303_00_033_1753650286010000000] Starting stage2_scene_detection
+2026-08-02 16:11:02 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:146] - PySceneDetect not available, using fallback detection
+2026-08-02 16:11:02 - insta360_analyzer.stages.stage2_scene_detection - INFO - [stage2_scene_detection.py:63] - [file_VID_20250727_170303_00_033_1753650286010000000] Detected 21 scenes
+2026-08-02 16:13:15 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: Command '['ffmpeg', '-i', 'C:\\Users\\swamx\\OneDrive\\Documents\\Camera01\\VID_20250727_170303_00_033.insv', '-ss', '37.5', '-vframes', '1', '-q:v', '2', 'data\\working\\scenes\\file_VID_20250727_170303_00_033_1753650286010000000_scene_007_keyframe.jpg', '-hide_banner', '-loglevel', 'error']' timed out after 30 seconds
+2026-08-02 16:13:45 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: Command '['ffmpeg', '-i', 'C:\\Users\\swamx\\OneDrive\\Documents\\Camera01\\VID_20250727_170303_00_033.insv', '-ss', '42.5', '-vframes', '1', '-q:v', '2', 'data\\working\\scenes\\file_VID_20250727_170303_00_033_1753650286010000000_scene_008_keyframe.jpg', '-hide_banner', '-loglevel', 'error']' timed out after 30 seconds
+2026-08-02 16:14:15 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: Command '['ffmpeg', '-i', 'C:\\Users\\swamx\\OneDrive\\Documents\\Camera01\\VID_20250727_170303_00_033.insv', '-ss', '47.5', '-vframes', '1', '-q:v', '2', 'data\\working\\scenes\\file_VID_20250727_170303_00_033_1753650286010000000_scene_009_keyframe.jpg', '-hide_banner', '-loglevel', 'error']' timed out after 30 seconds
+2026-08-02 16:14:45 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: Command '['ffmpeg', '-i', 'C:\\Users\\swamx\\OneDrive\\Documents\\Camera01\\VID_20250727_170303_00_033.insv', '-ss', '52.5', '-vframes', '1', '-q:v', '2', 'data\\working\\scenes\\file_VID_20250727_170303_00_033_1753650286010000000_scene_010_keyframe.jpg', '-hide_banner', '-loglevel', 'error']' timed out after 30 seconds
+2026-08-02 16:15:16 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: Command '['ffmpeg', '-i', 'C:\\Users\\swamx\\OneDrive\\Documents\\Camera01\\VID_20250727_170303_00_033.insv', '-ss', '57.5', '-vframes', '1', '-q:v', '2', 'data\\working\\scenes\\file_VID_20250727_170303_00_033_1753650286010000000_scene_011_keyframe.jpg', '-hide_banner', '-loglevel', 'error']' timed out after 30 seconds
+2026-08-02 16:15:46 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: Command '['ffmpeg', '-i', 'C:\\Users\\swamx\\OneDrive\\Documents\\Camera01\\VID_20250727_170303_00_033.insv', '-ss', '62.5', '-vframes', '1', '-q:v', '2', 'data\\working\\scenes\\file_VID_20250727_170303_00_033_1753650286010000000_scene_012_keyframe.jpg', '-hide_banner', '-loglevel', 'error']' timed out after 30 seconds
+2026-08-02 16:16:16 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: Command '['ffmpeg', '-i', 'C:\\Users\\swamx\\OneDrive\\Documents\\Camera01\\VID_20250727_170303_00_033.insv', '-ss', '67.5', '-vframes', '1', '-q:v', '2', 'data\\working\\scenes\\file_VID_20250727_170303_00_033_1753650286010000000_scene_013_keyframe.jpg', '-hide_banner', '-loglevel', 'error']' timed out after 30 seconds
+2026-08-02 16:16:46 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: Command '['ffmpeg', '-i', 'C:\\Users\\swamx\\OneDrive\\Documents\\Camera01\\VID_20250727_170303_00_033.insv', '-ss', '72.5', '-vframes', '1', '-q:v', '2', 'data\\working\\scenes\\file_VID_20250727_170303_00_033_1753650286010000000_scene_014_keyframe.jpg', '-hide_banner', '-loglevel', 'error']' timed out after 30 seconds
+2026-08-02 16:17:16 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: Command '['ffmpeg', '-i', 'C:\\Users\\swamx\\OneDrive\\Documents\\Camera01\\VID_20250727_170303_00_033.insv', '-ss', '77.5', '-vframes', '1', '-q:v', '2', 'data\\working\\scenes\\file_VID_20250727_170303_00_033_1753650286010000000_scene_015_keyframe.jpg', '-hide_banner', '-loglevel', 'error']' timed out after 30 seconds
+2026-08-02 16:17:29 - insta360_analyzer.pipeline - INFO - [pipeline.py:53] - Pipeline initialized (checkpoint_dir=data\working\checkpoints, data_dir=data)
+2026-08-02 16:17:29 - insta360_analyzer - INFO - [main.py:177] - ============================================================
+2026-08-02 16:17:29 - insta360_analyzer - INFO - [main.py:178] - PROCESSING: file_VID_20250727_171002_00_044_1753650615010000000
+2026-08-02 16:17:29 - insta360_analyzer - INFO - [main.py:179] - Input: C:\Users\swamx\OneDrive\Documents\Camera01\VID_20250727_171002_00_044.insv
+2026-08-02 16:17:29 - insta360_analyzer - INFO - [main.py:180] - Resume: False
+2026-08-02 16:17:29 - insta360_analyzer - INFO - [main.py:181] - ============================================================
+2026-08-02 16:17:29 - insta360_analyzer.pipeline - INFO - [logger.py:79] - [file_VID_20250727_171002_00_044_1753650615010000000] Starting processing (resume=False)
+2026-08-02 16:17:29 - insta360_analyzer.pipeline - INFO - [logger.py:79] - [file_VID_20250727_171002_00_044_1753650615010000000] Running Stage 1: Discovery
+2026-08-02 16:17:29 - insta360_analyzer.stages.stage1_discovery - INFO - [base.py:100] - [file_VID_20250727_171002_00_044_1753650615010000000] Starting stage1_discovery
+2026-08-02 16:17:29 - insta360_analyzer.stages.stage1_discovery - INFO - [base.py:104] - [file_VID_20250727_171002_00_044_1753650615010000000] Completed stage1_discovery
+2026-08-02 16:17:29 - insta360_analyzer.pipeline - INFO - [logger.py:79] - [file_VID_20250727_171002_00_044_1753650615010000000] Running Stage 2: Scene Detection
+2026-08-02 16:17:29 - insta360_analyzer.stages.stage2_scene_detection - INFO - [base.py:100] - [file_VID_20250727_171002_00_044_1753650615010000000] Starting stage2_scene_detection
+2026-08-02 16:17:29 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:146] - PySceneDetect not available, using fallback detection
+2026-08-02 16:17:29 - insta360_analyzer.stages.stage2_scene_detection - INFO - [stage2_scene_detection.py:63] - [file_VID_20250727_171002_00_044_1753650615010000000] Detected 3 scenes
+2026-08-02 16:17:46 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: Command '['ffmpeg', '-i', 'C:\\Users\\swamx\\OneDrive\\Documents\\Camera01\\VID_20250727_170303_00_033.insv', '-ss', '82.5', '-vframes', '1', '-q:v', '2', 'data\\working\\scenes\\file_VID_20250727_170303_00_033_1753650286010000000_scene_016_keyframe.jpg', '-hide_banner', '-loglevel', 'error']' timed out after 30 seconds
+2026-08-02 16:17:50 - insta360_analyzer.stages.stage2_scene_detection - INFO - [base.py:104] - [file_VID_20250727_171002_00_044_1753650615010000000] Completed stage2_scene_detection
+2026-08-02 16:17:50 - insta360_analyzer.pipeline - INFO - [logger.py:79] - [file_VID_20250727_171002_00_044_1753650615010000000] Running Stage 3: Vision Editor
+2026-08-02 16:17:50 - insta360_analyzer.stages.stage3_vision_editor - INFO - [base.py:100] - [file_VID_20250727_171002_00_044_1753650615010000000] Starting stage3_vision_editor
+2026-08-02 16:17:50 - insta360_analyzer.stages.stage3_vision_editor - ERROR - [stage3_vision_editor.py:52] - PyTorch/transformers not available, using mock scoring
+2026-08-02 16:17:50 - insta360_analyzer.stages.stage3_vision_editor - INFO - [stage3_vision_editor.py:149] - Scoring scene 1/3
+2026-08-02 16:17:50 - insta360_analyzer.stages.stage3_vision_editor - INFO - [stage3_vision_editor.py:149] - Scoring scene 2/3
+2026-08-02 16:17:50 - insta360_analyzer.stages.stage3_vision_editor - INFO - [stage3_vision_editor.py:149] - Scoring scene 3/3
+2026-08-02 16:17:50 - insta360_analyzer.stages.stage3_vision_editor - INFO - [base.py:104] - [file_VID_20250727_171002_00_044_1753650615010000000] Completed stage3_vision_editor
+2026-08-02 16:17:50 - insta360_analyzer.pipeline - INFO - [logger.py:79] - [file_VID_20250727_171002_00_044_1753650615010000000] Running Stage 4: Reel Assembly
+2026-08-02 16:17:50 - insta360_analyzer.stages.stage4_reel_assembly - INFO - [base.py:100] - [file_VID_20250727_171002_00_044_1753650615010000000] Starting stage4_reel_assembly
+2026-08-02 16:17:50 - insta360_analyzer.stages.stage4_reel_assembly - INFO - [stage4_reel_assembly.py:113] - [file_VID_20250727_171002_00_044_1753650615010000000] Assembling reel from 3 usable scenes
+2026-08-02 16:17:50 - insta360_analyzer.stages.stage4_reel_assembly - INFO - [stage4_reel_assembly.py:55] - Loading LLM for reel assembly...
+2026-08-02 16:17:53 - insta360_analyzer.stages.stage4_reel_assembly - WARNING - [stage4_reel_assembly.py:73] - Failed to load LLM: Using `low_cpu_mem_usage=True` or a `device_map` requires Accelerate: `pip install accelerate`, using heuristic
+2026-08-02 16:17:53 - insta360_analyzer.stages.stage4_reel_assembly - INFO - [base.py:104] - [file_VID_20250727_171002_00_044_1753650615010000000] Completed stage4_reel_assembly
+2026-08-02 16:17:53 - insta360_analyzer.pipeline - INFO - [logger.py:79] - [file_VID_20250727_171002_00_044_1753650615010000000] Running Stage 5: Encoding
+2026-08-02 16:17:53 - insta360_analyzer.stages.stage5_encoding - INFO - [base.py:100] - [file_VID_20250727_171002_00_044_1753650615010000000] Starting stage5_encoding
+2026-08-02 16:17:53 - insta360_analyzer.stages.stage5_encoding - INFO - [stage5_encoding.py:49] - [file_VID_20250727_171002_00_044_1753650615010000000] Encoding 3 clips
+2026-08-02 16:18:04 - insta360_analyzer.stages.stage5_encoding - INFO - [stage5_encoding.py:80] - [file_VID_20250727_171002_00_044_1753650615010000000] Extracted clip 1/3
+2026-08-02 16:18:12 - insta360_analyzer.stages.stage5_encoding - INFO - [stage5_encoding.py:80] - [file_VID_20250727_171002_00_044_1753650615010000000] Extracted clip 2/3
+2026-08-02 16:18:16 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: Command '['ffmpeg', '-i', 'C:\\Users\\swamx\\OneDrive\\Documents\\Camera01\\VID_20250727_170303_00_033.insv', '-ss', '87.5', '-vframes', '1', '-q:v', '2', 'data\\working\\scenes\\file_VID_20250727_170303_00_033_1753650286010000000_scene_017_keyframe.jpg', '-hide_banner', '-loglevel', 'error']' timed out after 30 seconds
+2026-08-02 16:18:16 - insta360_analyzer.stages.stage5_encoding - INFO - [stage5_encoding.py:80] - [file_VID_20250727_171002_00_044_1753650615010000000] Extracted clip 3/3
+2026-08-02 16:18:16 - insta360_analyzer.stages.stage5_encoding - INFO - [stage5_encoding.py:115] - [file_VID_20250727_171002_00_044_1753650615010000000] Concatenating 3 clips
+2026-08-02 16:18:17 - insta360_analyzer.stages.stage5_encoding - ERROR - [stage5_encoding.py:300] - FFmpeg stderr: [in#0 @ 0000022eb3a5b740] Impossible to open 'data\working\data\working\file_VID_20250727_171002_00_044_1753650615010000000_clips\clip_000.mp4'
+[in#0 @ 0000022eb3ad39c0] Error opening input: No such file or directory
+Error opening input file data\working\file_VID_20250727_171002_00_044_1753650615010000000_concat.txt.
+Error opening input files: No such file or directory
+
+2026-08-02 16:18:17 - insta360_analyzer - INFO - [main.py:185] - ============================================================
+2026-08-02 16:18:17 - insta360_analyzer - INFO - [main.py:186] - RESULTS
+2026-08-02 16:18:17 - insta360_analyzer - INFO - [main.py:187] - ============================================================
+2026-08-02 16:18:17 - insta360_analyzer - INFO - [main.py:188] - Success: False
+2026-08-02 16:18:17 - insta360_analyzer - ERROR - [main.py:198] - Error: Stage 5 failed: FFmpeg encoding failed
+2026-08-02 16:18:17 - insta360_analyzer - INFO - [main.py:200] - ============================================================
+2026-08-02 16:18:46 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: Command '['ffmpeg', '-i', 'C:\\Users\\swamx\\OneDrive\\Documents\\Camera01\\VID_20250727_170303_00_033.insv', '-ss', '92.5', '-vframes', '1', '-q:v', '2', 'data\\working\\scenes\\file_VID_20250727_170303_00_033_1753650286010000000_scene_018_keyframe.jpg', '-hide_banner', '-loglevel', 'error']' timed out after 30 seconds
+2026-08-02 16:19:16 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: Command '['ffmpeg', '-i', 'C:\\Users\\swamx\\OneDrive\\Documents\\Camera01\\VID_20250727_170303_00_033.insv', '-ss', '97.5', '-vframes', '1', '-q:v', '2', 'data\\working\\scenes\\file_VID_20250727_170303_00_033_1753650286010000000_scene_019_keyframe.jpg', '-hide_banner', '-loglevel', 'error']' timed out after 30 seconds
+2026-08-02 16:19:46 - insta360_analyzer.stages.stage2_scene_detection - WARNING - [stage2_scene_detection.py:284] - Frame extraction error: Command '['ffmpeg', '-i', 'C:\\Users\\swamx\\OneDrive\\Documents\\Camera01\\VID_20250727_170303_00_033.insv', '-ss', '101.0843665', '-vframes', '1', '-q:v', '2', 'data\\working\\scenes\\file_VID_20250727_170303_00_033_1753650286010000000_scene_020_keyframe.jpg', '-hide_banner', '-loglevel', 'error']' timed out after 30 seconds
+2026-08-02 16:19:46 - insta360_analyzer.stages.stage2_scene_detection - INFO - [base.py:104] - [file_VID_20250727_170303_00_033_1753650286010000000] Completed stage2_scene_detection
+2026-08-02 16:19:46 - insta360_analyzer.pipeline - INFO - [logger.py:79] - [file_VID_20250727_170303_00_033_1753650286010000000] Running Stage 3: Vision Editor
+2026-08-02 16:19:46 - insta360_analyzer.stages.stage3_vision_editor - INFO - [base.py:100] - [file_VID_20250727_170303_00_033_1753650286010000000] Starting stage3_vision_editor
+2026-08-02 16:19:46 - insta360_analyzer.stages.stage3_vision_editor - ERROR - [stage3_vision_editor.py:52] - PyTorch/transformers not available, using mock scoring
+2026-08-02 16:19:46 - insta360_analyzer.stages.stage3_vision_editor - INFO - [stage3_vision_editor.py:149] - Scoring scene 1/7
+2026-08-02 16:19:46 - insta360_analyzer.stages.stage3_vision_editor - INFO - [stage3_vision_editor.py:149] - Scoring scene 2/7
+2026-08-02 16:19:46 - insta360_analyzer.stages.stage3_vision_editor - INFO - [stage3_vision_editor.py:149] - Scoring scene 3/7
+2026-08-02 16:19:46 - insta360_analyzer.stages.stage3_vision_editor - INFO - [stage3_vision_editor.py:149] - Scoring scene 4/7
+2026-08-02 16:19:46 - insta360_analyzer.stages.stage3_vision_editor - INFO - [stage3_vision_editor.py:149] - Scoring scene 5/7
+2026-08-02 16:19:46 - insta360_analyzer.stages.stage3_vision_editor - INFO - [stage3_vision_editor.py:149] - Scoring scene 6/7
+2026-08-02 16:19:46 - insta360_analyzer.stages.stage3_vision_editor - INFO - [stage3_vision_editor.py:149] - Scoring scene 7/7
+2026-08-02 16:19:46 - insta360_analyzer.stages.stage3_vision_editor - INFO - [base.py:104] - [file_VID_20250727_170303_00_033_1753650286010000000] Completed stage3_vision_editor
+2026-08-02 16:19:46 - insta360_analyzer.pipeline - INFO - [logger.py:79] - [file_VID_20250727_170303_00_033_1753650286010000000] Running Stage 4: Reel Assembly
+2026-08-02 16:19:46 - insta360_analyzer.stages.stage4_reel_assembly - INFO - [base.py:100] - [file_VID_20250727_170303_00_033_1753650286010000000] Starting stage4_reel_assembly
+2026-08-02 16:19:46 - insta360_analyzer.stages.stage4_reel_assembly - INFO - [stage4_reel_assembly.py:113] - [file_VID_20250727_170303_00_033_1753650286010000000] Assembling reel from 7 usable scenes
+2026-08-02 16:19:46 - insta360_analyzer.stages.stage4_reel_assembly - INFO - [stage4_reel_assembly.py:55] - Loading LLM for reel assembly...
+2026-08-02 16:19:47 - insta360_analyzer.stages.stage4_reel_assembly - WARNING - [stage4_reel_assembly.py:73] - Failed to load LLM: Using `low_cpu_mem_usage=True` or a `device_map` requires Accelerate: `pip install accelerate`, using heuristic
+2026-08-02 16:19:47 - insta360_analyzer.stages.stage4_reel_assembly - INFO - [base.py:104] - [file_VID_20250727_170303_00_033_1753650286010000000] Completed stage4_reel_assembly
+2026-08-02 16:19:47 - insta360_analyzer.pipeline - INFO - [logger.py:79] - [file_VID_20250727_170303_00_033_1753650286010000000] Running Stage 5: Encoding
+2026-08-02 16:19:47 - insta360_analyzer.stages.stage5_encoding - INFO - [base.py:100] - [file_VID_20250727_170303_00_033_1753650286010000000] Starting stage5_encoding
+2026-08-02 16:19:47 - insta360_analyzer.stages.stage5_encoding - INFO - [stage5_encoding.py:49] - [file_VID_20250727_170303_00_033_1753650286010000000] Encoding 5 clips
+2026-08-02 16:20:06 - insta360_analyzer.stages.stage5_encoding - INFO - [stage5_encoding.py:80] - [file_VID_20250727_170303_00_033_1753650286010000000] Extracted clip 1/5
+2026-08-02 16:20:20 - insta360_analyzer.stages.stage5_encoding - INFO - [stage5_encoding.py:80] - [file_VID_20250727_170303_00_033_1753650286010000000] Extracted clip 2/5
+2026-08-02 16:20:31 - insta360_analyzer.stages.stage5_encoding - INFO - [stage5_encoding.py:80] - [file_VID_20250727_170303_00_033_1753650286010000000] Extracted clip 3/5
+2026-08-02 16:20:39 - insta360_analyzer.stages.stage5_encoding - INFO - [stage5_encoding.py:80] - [file_VID_20250727_170303_00_033_1753650286010000000] Extracted clip 4/5
+2026-08-02 16:21:05 - insta360_analyzer.stages.stage5_encoding - INFO - [stage5_encoding.py:80] - [file_VID_20250727_170303_00_033_1753650286010000000] Extracted clip 5/5
+2026-08-02 16:21:05 - insta360_analyzer.stages.stage5_encoding - INFO - [stage5_encoding.py:115] - [file_VID_20250727_170303_00_033_1753650286010000000] Concatenating 5 clips
+2026-08-02 16:21:05 - insta360_analyzer.stages.stage5_encoding - ERROR - [stage5_encoding.py:300] - FFmpeg stderr: [in#0 @ 0000024b372cb740] Impossible to open 'data\working\data\working\file_VID_20250727_170303_00_033_1753650286010000000_clips\clip_000.mp4'
+[in#0 @ 0000024b37343840] Error opening input: No such file or directory
+Error opening input file data\working\file_VID_20250727_170303_00_033_1753650286010000000_concat.txt.
+Error opening input files: No such file or directory
+
+2026-08-02 16:21:05 - insta360_analyzer - INFO - [main.py:178] - ============================================================
+2026-08-02 16:21:05 - insta360_analyzer - INFO - [main.py:179] - RESULTS
+2026-08-02 16:21:05 - insta360_analyzer - INFO - [main.py:180] - ============================================================
+2026-08-02 16:21:05 - insta360_analyzer - INFO - [main.py:181] - Success: False
+2026-08-02 16:21:05 - insta360_analyzer - ERROR - [main.py:191] - Error: Stage 5 failed: FFmpeg encoding failed
+2026-08-02 16:21:05 - insta360_analyzer - INFO - [main.py:193] - ============================================================

@@ -110,7 +110,9 @@ class Stage5Encoding(Stage):
             concat_file = Path("data/working") / f"{file_id}_concat.txt"
             with open(concat_file, "w") as f:
                 for clip_path in extracted_clips:
-                    f.write(f"file '{clip_path}'\n")
+                    # Use absolute paths for FFmpeg concat file
+                    abs_path = Path(clip_path).resolve()
+                    f.write(f"file '{abs_path}'\n")
 
             logger.info(f"[{file_id}] Concatenating {len(extracted_clips)} clips")
 

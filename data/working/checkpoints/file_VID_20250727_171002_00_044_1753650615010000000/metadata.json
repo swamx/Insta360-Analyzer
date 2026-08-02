@@ -1,0 +1,16 @@
+{
+  "file_id": "file_VID_20250727_171002_00_044_1753650615010000000",
+  "source_path": "C:\\Users\\swamx\\OneDrive\\Documents\\Camera01\\VID_20250727_171002_00_044.insv",
+  "state": "REEL_ASSEMBLED",
+  "stage_timestamps": {
+    "DISCOVERED": "2026-08-02T20:17:29.248941Z",
+    "SCENES_DETECTED": "2026-08-02T20:17:50.760208Z",
+    "ANALYZED": "2026-08-02T20:17:50.797322Z",
+    "REEL_ASSEMBLED": "2026-08-02T20:17:53.812451Z"
+  },
+  "file_size_bytes": 146984203,
+  "file_size_gb": 0.13688970636576414,
+  "file_type": "unknown",
+  "ingest_timestamp": "2026-08-02T20:17:29.248941Z",
+  "scene_count": 3
+}
