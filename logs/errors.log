@@ -23,3 +23,4 @@ Error opening input files: No such file or directory
 2026-08-02 16:40:31 - insta360_analyzer.stages.stage3_vision_editor - ERROR - [stage3_vision_editor.py:52] - PyTorch/transformers not available, using mock scoring
 2026-08-02 16:40:32 - insta360_analyzer - ERROR - [main.py:198] - Error: Stage 5 failed: No clips extracted
 2026-08-02 16:41:14 - insta360_analyzer.stages.stage3_vision_editor - ERROR - [stage3_vision_editor.py:52] - PyTorch/transformers not available, using mock scoring
+2026-08-02 16:58:58 - insta360_analyzer.stages.stage3_vision_editor - ERROR - [stage3_vision_editor.py:52] - PyTorch/transformers not available, using mock scoring

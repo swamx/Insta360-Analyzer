@@ -1,0 +1,18 @@
+{
+  "output_video": "C:\\Users\\swamx\\OneDrive\\Documents\\Camera01\\VID_20250727_170303_00_033.insv",
+  "was_360": false,
+  "conversion_applied": false,
+  "metadata": {
+    "is_insta360": true,
+    "projection": "perspective",
+    "format": "mov,mp4,m4a,3gp,3g2,mj2",
+    "duration": 102.168733,
+    "bit_rate": 85547707,
+    "width": 2880,
+    "height": 2880,
+    "fps": 29.97002997002997,
+    "codec": "hevc",
+    "camera_make": "unknown",
+    "camera_model": "unknown"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "file_id": "file_VID_20250727_170303_00_033_1753650286010000000",
+  "source_path": "C:\\Users\\swamx\\OneDrive\\Documents\\Camera01\\VID_20250727_170303_00_033.insv",
+  "state": "COMPLETED",
+  "stage_timestamps": {
+    "DISCOVERED": "2026-08-02T20:52:25.661137Z",
+    "SCENES_DETECTED": "2026-08-02T20:58:58.690022Z",
+    "ANALYZED": "2026-08-02T20:58:58.888756Z",
+    "REEL_ASSEMBLED": "2026-08-02T20:59:03.119781Z",
+    "COMPLETED": "2026-08-02T21:04:20.921457Z"
+  },
+  "file_size_bytes": 1092537613,
+  "file_size_gb": 1.0175049426034093,
+  "file_type": "unknown",
+  "ingest_timestamp": "2026-08-02T20:52:25.639093Z",
+  "scene_count": 8,
+  "output_path": "data\\output\\file_VID_20250727_170303_00_033_1753650286010000000_reel.mp4"
+}

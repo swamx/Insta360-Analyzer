@@ -1,0 +1,12 @@
+{
+  "stage": "stage5_encoding",
+  "file_id": "file_VID_20250727_170303_00_033_1753650286010000000",
+  "source_video": "C:\\Users\\swamx\\OneDrive\\Documents\\Camera01\\VID_20250727_170303_00_033.insv",
+  "clips_to_encode": 8,
+  "clips_encoded": 8,
+  "output_path": "data\\output\\file_VID_20250727_170303_00_033_1753650286010000000_reel.mp4",
+  "final_duration_seconds": 24.056633,
+  "file_size_mb": 26.240541458129883,
+  "status": "ENCODED",
+  "timestamp": "2026-08-02T21:04:20.906521Z"
+}
