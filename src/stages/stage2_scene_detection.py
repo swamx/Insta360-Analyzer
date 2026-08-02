@@ -6,11 +6,17 @@ from datetime import datetime
 from typing import Optional, List
 from PIL import Image
 import json
+import logging as stdlib_logging
 
 from src.stages.base import Stage, StageResult, ProgressInfo
 from src.storage.checkpoint_manager import CheckpointManager
 from src.utils.logger import get_logger
 
+try:
+    from scenedetect import detect, AdaptiveDetector, ContentDetector
+    SCENEDETECT_AVAILABLE = True
+except ImportError:
+    SCENEDETECT_AVAILABLE = False
 
 logger = get_logger("stages.stage2_scene_detection")
 
@@ -132,22 +138,79 @@ class Stage2SceneDetection(Stage):
             )
 
     def _detect_scenes(self, video_path: Path) -> List[tuple]:
-        """Detect scene boundaries using FFmpeg frame diff."""
+        """Detect scene boundaries using PySceneDetect or fallback."""
         try:
-            # For testing, use FFmpeg to analyze scene changes
-            # Real implementation would use PySceneDetect library
-            # For now, return mock scenes based on video duration
+            if SCENEDETECT_AVAILABLE:
+                return self._detect_scenes_with_pyscenedetect(video_path)
+            else:
+                logger.warning("PySceneDetect not available, using fallback detection")
+                return self._detect_scenes_fallback(video_path)
 
-            # Get video duration
+        except Exception as e:
+            logger.error(f"Scene detection failed: {str(e)}, using fallback")
+            return self._detect_scenes_fallback(video_path)
+
+    def _detect_scenes_with_pyscenedetect(self, video_path: Path) -> List[tuple]:
+        """Detect scenes using PySceneDetect library."""
+        try:
+            # Suppress PySceneDetect's own logging
+            psd_logger = stdlib_logging.getLogger("scenedetect")
+            psd_logger.setLevel(stdlib_logging.WARNING)
+
+            logger.info(f"Detecting scenes with PySceneDetect (threshold={self.threshold})")
+
+            # Try adaptive detector first (more accurate for varied content)
+            try:
+                scenes = detect(str(video_path), AdaptiveDetector())
+                if len(scenes) >= 2:
+                    logger.info(f"Adaptive detector found {len(scenes)} scenes")
+                    return self._convert_pyscenedetect_output(video_path, scenes)
+            except Exception as e:
+                logger.warning(f"Adaptive detector failed: {str(e)}")
+
+            # Fallback to content detector
+            logger.info("Trying content detector")
+            scenes = detect(str(video_path), ContentDetector(threshold=self.threshold))
+
+            if len(scenes) >= 1:
+                logger.info(f"Content detector found {len(scenes)} scenes")
+                return self._convert_pyscenedetect_output(video_path, scenes)
+            else:
+                logger.warning("No scenes detected with PySceneDetect")
+                return self._detect_scenes_fallback(video_path)
+
+        except Exception as e:
+            logger.error(f"PySceneDetect error: {str(e)}")
+            return self._detect_scenes_fallback(video_path)
+
+    @staticmethod
+    def _convert_pyscenedetect_output(video_path: Path, scenes: List) -> List[tuple]:
+        """Convert PySceneDetect output to internal format."""
+        result = []
+
+        for i, scene in enumerate(scenes):
+            # PySceneDetect returns (start_time, end_time) in seconds
+            start_time = float(scene[0].get_seconds())
+            end_time = float(scene[1].get_seconds()) if i < len(scenes) - 1 else Stage2SceneDetection._get_video_duration(video_path)
+
+            # Estimate frame numbers at 30fps
+            start_frame = int(start_time * 30)
+            end_frame = int(end_time * 30)
+
+            result.append((start_frame, start_time, end_frame, end_time))
+
+        return result
+
+    def _detect_scenes_fallback(self, video_path: Path) -> List[tuple]:
+        """Fallback scene detection: split by fixed duration."""
+        try:
             duration = self._get_video_duration(video_path)
 
             if duration <= 0:
                 return []
 
-            # Create mock scenes (in real implementation, use PySceneDetect)
-            # For testing: split video into ~5 second chunks
             scenes = []
-            chunk_duration = 5.0
+            chunk_duration = 5.0  # 5-second chunks
             scene_count = int(duration / chunk_duration) + 1
 
             for i in range(scene_count):
@@ -156,17 +219,17 @@ class Stage2SceneDetection(Stage):
 
                 if start_time < duration:
                     scenes.append((
-                        int(start_time * 30),  # Approximate frame number at 30fps
+                        int(start_time * 30),
                         start_time,
                         int(end_time * 30),
                         end_time,
                     ))
 
-            logger.debug(f"Created {len(scenes)} scenes from video")
+            logger.debug(f"Fallback: created {len(scenes)} scenes from video")
             return scenes
 
         except Exception as e:
-            logger.error(f"Scene detection failed: {str(e)}")
+            logger.error(f"Fallback scene detection failed: {str(e)}")
             return []
 
     def _extract_key_frame(

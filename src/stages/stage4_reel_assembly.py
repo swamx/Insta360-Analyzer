@@ -1,6 +1,7 @@
 """Stage 4: Reel Assembly - Create optimal 15-second reel."""
 
 import json
+import re
 from datetime import datetime
 from typing import Optional, Dict, Any, List
 
@@ -8,24 +9,70 @@ from src.stages.base import Stage, StageResult, ProgressInfo
 from src.storage.checkpoint_manager import CheckpointManager
 from src.utils.logger import get_logger
 
+try:
+    from transformers import AutoTokenizer, AutoModelForCausalLM
+    import torch
+
+    LLM_AVAILABLE = True
+except ImportError:
+    LLM_AVAILABLE = False
 
 logger = get_logger("stages.stage4_reel_assembly")
 
 
 class Stage4ReelAssembly(Stage):
-    """Assemble optimal 15-second reel from scored scenes."""
+    """Assemble optimal 15-second reel from scored scenes using LLM guidance."""
 
     def __init__(
         self,
         checkpoint_manager: CheckpointManager,
         max_duration_seconds: float = 15.0,
         skip_model_load: bool = False,
+        use_llm: bool = True,
     ):
         super().__init__("stage4_reel_assembly")
         self.checkpoint_manager = checkpoint_manager
         self.max_duration_seconds = max_duration_seconds
         self.skip_model_load = skip_model_load
+        self.use_llm = use_llm
         self.model = None
+        self.tokenizer = None
+
+    def _load_model(self) -> None:
+        """Load LLM for reel assembly guidance."""
+        if self.skip_model_load or not self.use_llm:
+            return
+
+        if self.model is not None:
+            return
+
+        if not LLM_AVAILABLE:
+            logger.warning("PyTorch/transformers not available, using heuristic")
+            return
+
+        try:
+            # Use a smaller, efficient LLM for text-only reasoning
+            logger.info("Loading LLM for reel assembly...")
+
+            model_name = "gpt2"  # Fallback to GPT2 for assembly reasoning
+            # Or use: "meta-llama/Llama-2-7b-hf" if available
+            # Or: "mistralai/Mistral-7B-Instruct-v0.1"
+
+            self.tokenizer = AutoTokenizer.from_pretrained(model_name)
+            self.model = AutoModelForCausalLM.from_pretrained(
+                model_name,
+                device_map="auto" if torch.cuda.is_available() else "cpu",
+                torch_dtype=torch.float32,
+            )
+
+            if self.model:
+                self.model.eval()
+                logger.info(f"LLM loaded: {model_name}")
+
+        except Exception as e:
+            logger.warning(f"Failed to load LLM: {str(e)}, using heuristic")
+            self.model = None
+            self.tokenizer = None
 
     def run(
         self,
@@ -129,14 +176,102 @@ class Stage4ReelAssembly(Stage):
             )
 
     def _assemble_reel(self, scenes: List[Dict[str, Any]]) -> Dict[str, Any]:
-        """Assemble optimal 15-second reel from scored scenes."""
-        if self.skip_model_load:
+        """Assemble optimal 15-second reel from scored scenes using LLM or heuristic."""
+        if self.skip_model_load or not self.use_llm:
             return self._default_reel_plan(scenes)
 
-        # TODO: Call LLM to create reel plan
-        # For now, use heuristic approach
+        self._load_model()
 
+        # Try LLM-based assembly
+        if self.model is not None:
+            try:
+                return self._assemble_reel_with_llm(scenes)
+            except Exception as e:
+                logger.warning(f"LLM assembly failed: {str(e)}, using heuristic")
+
+        # Fallback to heuristic
         return self._default_reel_plan(scenes)
+
+    def _assemble_reel_with_llm(self, scenes: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """Use LLM to create optimal reel assembly plan."""
+        try:
+            # Prepare scene data for LLM
+            scene_data = []
+            for scene in scenes[:20]:  # Use top 20 scenes
+                scene_data.append({
+                    "scene_id": scene.get("scene_id", "unknown"),
+                    "duration": scene.get("duration_seconds", 5.0),
+                    "score": round(scene.get("overall_score", 5.0), 1),
+                    "description": scene.get("brief_description", "Scene"),
+                    "start_time_ms": scene.get("start_time_ms", 0),
+                    "end_time_ms": scene.get("end_time_ms", 0),
+                })
+
+            prompt = f"""Create a 15-second Instagram Reel edit plan from these scenes:
+
+Available scenes (sorted by quality score):
+{json.dumps(scene_data[:10], indent=2)}
+
+Requirements:
+- Total duration must be ≤15 seconds
+- Start strong (first 2-3 seconds should be high-impact)
+- Clips should be 1.5-3 seconds each
+- Avoid repetitive shots back-to-back
+- End with the most impressive shot
+- Prefer scenes with score > 7.0
+
+Return a JSON edit plan like this:
+{{
+  "clips": [
+    {{"scene_id": "...", "start_ms": 0, "end_ms": 3000, "duration_s": 3.0}},
+    ...
+  ],
+  "total_duration": 14.8,
+  "reasoning": "..."
+}}
+
+Respond with ONLY the JSON, no other text."""
+
+            # Generate with LLM
+            inputs = self.tokenizer(prompt, return_tensors="pt")
+            inputs = {k: v.to(self.model.device) for k, v in inputs.items()}
+
+            with torch.no_grad():
+                output_ids = self.model.generate(
+                    **inputs,
+                    max_new_tokens=400,
+                    temperature=0.7,
+                    top_p=0.9,
+                )
+
+            response = self.tokenizer.decode(output_ids[0], skip_special_tokens=True)
+
+            # Parse JSON from response
+            json_match = re.search(r'\{.*\}', response, re.DOTALL)
+            if json_match:
+                try:
+                    plan_data = json.loads(json_match.group())
+
+                    # Validate and normalize
+                    clips = plan_data.get("clips", [])
+                    total_duration = plan_data.get("total_duration", 0)
+
+                    if clips and total_duration > 0 and total_duration <= self.max_duration_seconds:
+                        logger.info(f"LLM created {len(clips)} clips in {total_duration}s")
+                        return {
+                            "total_duration": total_duration,
+                            "reasoning": plan_data.get("reasoning", "LLM assembly"),
+                            "clips": clips,
+                        }
+                except (json.JSONDecodeError, KeyError):
+                    pass
+
+            logger.debug("LLM response not valid, falling back to heuristic")
+            return self._default_reel_plan(scenes)
+
+        except Exception as e:
+            logger.warning(f"LLM assembly error: {str(e)}")
+            return self._default_reel_plan(scenes)
 
     def _default_reel_plan(self, scenes: List[Dict[str, Any]]) -> Dict[str, Any]:
         """Create reel plan using heuristic approach."""

@@ -6,11 +6,18 @@ from pathlib import Path
 from datetime import datetime
 from typing import Optional, Dict, Any
 import numpy as np
+from PIL import Image
 
 from src.stages.base import Stage, StageResult, ProgressInfo
 from src.storage.checkpoint_manager import CheckpointManager
 from src.utils.logger import get_logger
 
+try:
+    import torch
+    from transformers import Qwen2VLForConditionalGeneration, AutoProcessor
+    QWEN_AVAILABLE = True
+except ImportError:
+    QWEN_AVAILABLE = False
 
 logger = get_logger("stages.stage3_vision_editor")
 
@@ -22,10 +29,12 @@ class Stage3VisionEditor(Stage):
         self,
         checkpoint_manager: CheckpointManager,
         skip_model_load: bool = False,
+        model_name: str = "Qwen/Qwen2.5-VL-7B",
     ):
         super().__init__("stage3_vision_editor")
         self.checkpoint_manager = checkpoint_manager
         self.skip_model_load = skip_model_load
+        self.model_name = model_name
         self.model = None
         self.processor = None
 
@@ -36,17 +45,63 @@ class Stage3VisionEditor(Stage):
             return
 
         if self.model is not None:
+            logger.debug("Model already loaded")
+            return
+
+        if not QWEN_AVAILABLE:
+            logger.error("PyTorch/transformers not available, using mock scoring")
             return
 
         try:
-            # TODO: Load actual Qwen2.5-VL model
-            # from transformers import Qwen2VLForConditionalGeneration, AutoProcessor
-            # self.model = Qwen2VLForConditionalGeneration.from_pretrained(...)
-            # self.processor = AutoProcessor.from_pretrained(...)
-            logger.info("Model would be loaded here (stub for testing)")
+            logger.info(f"Loading {self.model_name}...")
+
+            # Determine device
+            device = "cuda" if torch.cuda.is_available() else "cpu"
+            logger.info(f"Using device: {device}")
+
+            # Load model with 4-bit quantization if CUDA available
+            if device == "cuda":
+                try:
+                    self.model = Qwen2VLForConditionalGeneration.from_pretrained(
+                        self.model_name,
+                        device_map="auto",
+                        torch_dtype=torch.float16,
+                        load_in_4bit=True,
+                        trust_remote_code=True,
+                    )
+                    logger.info("Model loaded with 4-bit quantization")
+                except Exception as e:
+                    logger.warning(f"4-bit loading failed, trying float32: {str(e)}")
+                    self.model = Qwen2VLForConditionalGeneration.from_pretrained(
+                        self.model_name,
+                        device_map="auto",
+                        torch_dtype=torch.float32,
+                        trust_remote_code=True,
+                    )
+            else:
+                # CPU: use float32
+                self.model = Qwen2VLForConditionalGeneration.from_pretrained(
+                    self.model_name,
+                    device_map=device,
+                    torch_dtype=torch.float32,
+                    trust_remote_code=True,
+                )
+                logger.info("Model loaded on CPU (float32)")
+
+            # Load processor
+            self.processor = AutoProcessor.from_pretrained(
+                self.model_name,
+                trust_remote_code=True,
+            )
+
+            self.model.eval()
+            logger.info("Model loaded successfully and set to eval mode")
+
         except Exception as e:
             logger.error(f"Failed to load model: {str(e)}")
-            raise
+            logger.warning("Will use mock scoring as fallback")
+            self.model = None
+            self.processor = None
 
     def run(
         self,
@@ -151,19 +206,158 @@ class Stage3VisionEditor(Stage):
         """Score a scene as a professional video editor."""
         try:
             # For testing: use deterministic mock scoring
-            if self.skip_model_load:
+            if self.skip_model_load or self.model is None:
                 return self._mock_score(scene)
 
-            # TODO: Real LLM inference
-            # Load key frame image
-            # Prompt LLM as editor
-            # Parse JSON response
-
-            return self._mock_score(scene)
+            # Real LLM inference
+            return self._score_scene_real(scene)
 
         except Exception as e:
-            logger.warning(f"Failed to score scene: {str(e)}")
-            return self._default_score()
+            logger.warning(f"Failed to score scene: {str(e)}, using mock")
+            return self._mock_score(scene)
+
+    def _score_scene_real(self, scene: Dict[str, Any]) -> Dict[str, Any]:
+        """Real LLM-based scene scoring."""
+        try:
+            key_frame_path = scene.get("key_frame_path")
+
+            if not key_frame_path or not Path(key_frame_path).exists():
+                logger.warning(f"Key frame not found: {key_frame_path}, using mock")
+                return self._mock_score(scene)
+
+            # Load image
+            image = Image.open(key_frame_path).convert("RGB")
+
+            # Craft prompt as professional editor
+            prompt = """You are a professional social media video editor and Instagram Reel curator.
+
+Analyze this video frame and provide a JSON assessment for use in creating a high-energy Instagram Reel.
+
+Rate these aspects on a 1-10 scale:
+- scenic_beauty: Visual composition, natural beauty, cinematic appeal (1=ugly, 10=stunning)
+- action: Motion, energy, dynamic content (1=static, 10=highly energetic)
+- emotion: Emotional impact, storytelling power (1=neutral, 10=compelling)
+- stability: Camera/image stability, technical quality (1=shaky/blurry, 10=perfectly stable)
+- blurriness: Image sharpness and clarity (1=very blurry, 10=crystal clear)
+
+Also provide:
+- brief_description: One sentence describing what happens in this frame
+- is_usable: true if suitable for Instagram Reel, false if poor quality/unusable
+- overall_score: Average of all numeric scores (1-10)
+
+CRITICAL: Return ONLY valid JSON, nothing else. No markdown, no code blocks, just JSON.
+
+{
+  "scenic_beauty": <1-10>,
+  "action": <1-10>,
+  "emotion": <1-10>,
+  "stability": <1-10>,
+  "blurriness": <1-10>,
+  "brief_description": "<one sentence>",
+  "is_usable": <true/false>,
+  "overall_score": <float>
+}"""
+
+            # Prepare input
+            messages = [
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "image", "image": image},
+                        {"type": "text", "text": prompt},
+                    ],
+                }
+            ]
+
+            # Process and generate
+            text = self.processor.apply_chat_template(
+                messages,
+                tokenize=False,
+                add_generation_prompt=True,
+            )
+
+            image_inputs = self.processor(
+                text=text,
+                images=[image],
+                padding=True,
+                return_tensors="pt",
+            ).to(self.model.device)
+
+            # Generate with appropriate settings
+            with torch.no_grad():
+                output_ids = self.model.generate(
+                    **image_inputs,
+                    max_new_tokens=200,
+                    temperature=0.7,
+                    top_p=0.9,
+                )
+
+            # Decode response
+            response_text = self.processor.batch_decode(
+                output_ids,
+                skip_special_tokens=True,
+            )[0]
+
+            logger.debug(f"LLM response: {response_text[:200]}")
+
+            # Extract and parse JSON
+            score_data = self._parse_llm_response(response_text)
+
+            if score_data:
+                logger.info(f"Scene score: {score_data.get('overall_score', 'N/A')}")
+                return score_data
+            else:
+                logger.warning("Failed to parse LLM response, using mock")
+                return self._mock_score(scene)
+
+        except Exception as e:
+            logger.warning(f"Real LLM scoring failed: {str(e)}, using mock")
+            return self._mock_score(scene)
+
+    @staticmethod
+    def _parse_llm_response(response_text: str) -> Optional[Dict[str, Any]]:
+        """Extract JSON from LLM response."""
+        try:
+            # Try to find JSON in response
+            json_match = re.search(r'\{.*\}', response_text, re.DOTALL)
+
+            if not json_match:
+                return None
+
+            json_str = json_match.group()
+            data = json.loads(json_str)
+
+            # Validate required fields
+            required_fields = [
+                "scenic_beauty",
+                "action",
+                "emotion",
+                "stability",
+                "blurriness",
+                "overall_score",
+                "is_usable",
+            ]
+
+            for field in required_fields:
+                if field not in data:
+                    return None
+
+            # Ensure scores are numeric and in range
+            for field in ["scenic_beauty", "action", "emotion", "stability", "blurriness"]:
+                if not isinstance(data[field], (int, float)):
+                    return None
+                data[field] = min(10, max(1, float(data[field])))
+
+            data["overall_score"] = min(
+                10,
+                max(1, float(data["overall_score"])),
+            )
+
+            return data
+
+        except (json.JSONDecodeError, AttributeError, ValueError) as e:
+            logger.debug(f"JSON parsing failed: {str(e)}")
+            return None
 
     @staticmethod
     def _mock_score(scene: Dict[str, Any]) -> Dict[str, Any]:
