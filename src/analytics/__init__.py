@@ -45,6 +45,26 @@ from .implementations import (
     PerspectiveSelectorComponent,
 )
 
+# Feedback and learning
+from .feedback import (
+    UserFeedback,
+    FeedbackType,
+    FeedbackCategory,
+    FeedbackSource,
+    FeedbackPattern,
+    FeedbackReport,
+    FeedbackCollector,
+    FeedbackAnalyzer,
+    LearningEngine,
+)
+
+# Adaptive reel generation
+from .adaptive_reel import (
+    ReelConfiguration,
+    AdaptiveReelGenerator,
+    AdaptiveFlowManager,
+)
+
 __all__ = [
     # Legacy
     "SceneAnalyzer",
@@ -86,4 +106,18 @@ __all__ = [
     "SubjectDetector",
     "SceneryAnalyzer",
     "PerspectiveSelectorComponent",
+    # Feedback and learning
+    "UserFeedback",
+    "FeedbackType",
+    "FeedbackCategory",
+    "FeedbackSource",
+    "FeedbackPattern",
+    "FeedbackReport",
+    "FeedbackCollector",
+    "FeedbackAnalyzer",
+    "LearningEngine",
+    # Adaptive reel generation
+    "ReelConfiguration",
+    "AdaptiveReelGenerator",
+    "AdaptiveFlowManager",
 ]
