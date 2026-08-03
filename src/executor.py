@@ -246,7 +246,8 @@ class ReelExecutor:
 
 def main():
     """Main entry point."""
-    setup_logging(verbose=True)
+    import logging
+    setup_logging(level=logging.DEBUG)
 
     # Test video path
     video_path = Path("C:/Users/swamx/OneDrive/Documents/Camera01/VID_20250727_170303_00_033.insv")
