@@ -1,0 +1,13 @@
+{
+  "stage": "stage1_discovery",
+  "file_id": "file_VID_20250727_170303_00_033_1785730556606031872",
+  "catalog": {
+    "file_id": "file_VID_20250727_170303_00_033_1785730556606031872",
+    "source_path": "C:\\Users\\swamx\\OneDrive\\Documents\\Camera01\\VID_20250727_170303_00_033.insv",
+    "file_size_bytes": 1092537613,
+    "file_size_gb": 1.0175049426034093,
+    "file_type": "unknown",
+    "ingest_timestamp": "2026-08-03T04:15:56.606032Z"
+  },
+  "timestamp": "2026-08-03T04:15:56.606032Z"
+}

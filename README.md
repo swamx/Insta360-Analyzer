@@ -1,195 +1,83 @@
-# Insta360 Video Analyzer 🎬
+# Insta360 Analyzer
 
-**AI-powered analyzer** that creates 15-second Instagram Reels from Insta360 videos using real PySceneDetect scene detection, Qwen2.5-VL vision analysis, and intelligent LLM-based reel assembly.
-
-**Status**: ✅ **Production Ready (Phase 2 Complete)**  
-**Tests**: 107 Passing | 13 Skipped | 0 Failing (100% pass rate)
-
-## Features
-
-✅ **Real Scene Detection** - PySceneDetect with intelligent fallback  
-✅ **Real Vision Analysis** - Qwen2.5-VL-7B 4-bit quantized model  
-✅ **Intelligent Assembly** - LLM-based reel composition with heuristic fallback  
-✅ **Professional Encoding** - FFmpeg vertical format (1080×1920) Instagram Reels  
-✅ **Fault Tolerant** - Atomic checkpoint/resume with zero data loss  
-✅ **Local Processing** - 100% local, no cloud APIs required  
-✅ **Robust Fallbacks** - 3-tier fallback system ensures system always works    
+Professional-grade AI-powered video analyzer for Insta360 content. Converts 360° videos to publication-ready Instagram reels with intelligent quality assurance.
 
 ## Quick Start
 
-### Prerequisites
-- Python 3.10+
-- NVIDIA GPU with 6GB+ VRAM
-- FFmpeg 4.4+
-- 50GB free disk space (for test media and working files)
+```python
+from src.executor import ReelExecutor
+from pathlib import Path
 
-### Setup
+executor = ReelExecutor(
+    video_path=Path("video.insv"),
+    data_dir=Path("data"),
+    max_duration=0,  # Unlimited
+)
+
+results = executor.run()
+executor.print_summary()
+executor.save_results()
+```
+
+## Documentation
+
+- **[Project Guide](docs/README_PROJECT.md)** - Complete system overview
+- **[Quick Start](docs/QUICK_START.md)** - Get running in 5 minutes
+- **[Flow Architecture](docs/FLOW_ARCHITECTURE_GUIDE.md)** - DAG orchestration & abstract components
+- **[ReACT QA Agent](docs/REACT_QA_AGENT_GUIDE.md)** - Quality assurance loop
+- **[Feedback System](docs/FEEDBACK_LEARNING_GUIDE.md)** - Continuous improvement
+- **[Analytics](docs/ANALYTICS_TRACEABILITY_GUIDE.md)** - Scene detection & vision analysis
+- **[Setup Guide](docs/SETUP.md)** - Installation & configuration
+- **[Testing](docs/TESTING.md)** - Running tests
+
+## Architecture
+
+### 6-Stage Pipeline
+1. **Stage 0.5** - Insta360 360° → single-perspective conversion
+2. **Stage 1** - Video discovery (properties, duration)
+3. **Stage 2** - Scene detection (boundaries, keyframes)
+4. **Stage 3** - Vision analysis (Qwen2.5-VL scoring)
+5. **Stage 4** - Reel assembly (scene composition)
+6. **Stage 5** - Encoding (1080×1920 vertical format)
+
+### Quality Assurance
+- **ReACT Agent** - Reason-Act-Observe loop for iterative improvement
+- **Feedback System** - Collect user ratings, learn preferences
+- **Persistent Caching** - Resume from checkpoints, crash recovery
+- **Execution Traces** - Full transparency of decisions
+
+## Key Features
+
+✅ **Insta360 Support** - Detect & convert 360° videos  
+✅ **Professional Analysis** - Real scene detection, vision model scoring  
+✅ **Autonomous Quality** - ReACT agent improves iteratively  
+✅ **Crash Recovery** - Checkpoint + resume from any stage  
+✅ **Learning System** - Continuously improves from feedback  
+✅ **Type Safe** - 100% Pydantic validation  
+✅ **Production Ready** - Logging, monitoring, error handling  
+
+## Installation
 
 ```bash
-# Clone and enter project
-git clone <repo-url>
+# Clone and setup
+git clone https://github.com/swamx/Insta360-Analyzer.git
 cd Insta360-Analyzer
-
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
 
-# Download Qwen3-VL-2B model
-python scripts/download_model.py
+# Run tests
+python -m pytest tests/
 
-# Verify setup
-python main.py --health-check
+# Start analysis
+python src/main.py --video path/to/video.insv
 ```
 
-### Basic Usage
+## Status
 
-```bash
-# Process a single video
-python main.py --input /path/to/video.mp4
-
-# Resume interrupted processing
-python main.py --input /path/to/video.mp4 --resume
-
-# Check processing status
-python main.py --status video_id
-
-# View available options
-python main.py --help
-```
-
-## Pipeline Overview
-
-The analyzer runs your video through 5 stages:
-
-1. **Discovery** - Catalog video metadata and prepare for processing
-2. **Frame Extraction** - Extract frames at regular intervals
-3. **Vision Analysis** - Analyze frames with Qwen3-VL-2B model
-4. **Highlight Detection** - Identify interesting clips and scenes
-5. **Encoding** - Generate final MP4 reels for Instagram
-
-Each stage checkpoints its results, so you can resume from any failure point.
-
-## Architecture
-
-See [ARCHITECTURE.md](ARCHITECTURE.md) for:
-- Detailed pipeline design
-- Checkpoint and recovery strategy  
-- State machine and error handling
-- Technical decisions and trade-offs
-
-See [GOAL.md](GOAL.md) for project vision and success criteria.
-
-## Project Structure
-
-```
-Insta360-Analyzer/
-├── src/                    # Core implementation
-│   ├── main.py            # Entry point
-│   ├── pipeline.py        # Pipeline orchestrator
-│   ├── checkpoint.py      # Checkpoint I/O
-│   ├── recovery.py        # Recovery logic
-│   ├── stages/            # Pipeline stages (1-5)
-│   ├── models/            # Vision model wrapper
-│   ├── processing/        # Frame/video utilities
-│   ├── storage/           # Checkpoint storage
-│   ├── utils/             # Logging, errors, device detection
-│   └── cli/               # CLI commands
-│
-├── config/                # Configuration files
-├── data/                  # Input, working, output, models
-├── tests/                 # Unit and integration tests
-├── docs/                  # Additional documentation
-├── ARCHITECTURE.md        # Design documentation
-├── GOAL.md               # Project goals and requirements
-└── requirements.txt      # Python dependencies
-```
-
-## Checkpoint/Resume Strategy
-
-**The key feature:** You can stop processing at any point and resume without losing progress.
-
-```bash
-# Process stops after stage 2 (frame extraction)
-python main.py --input video.mp4
-# ... [interrupts after Stage 2]
-
-# Resume - automatically continues from stage 3
-python main.py --input video.mp4 --resume
-# Stages 1-2 are skipped (already completed)
-# Stage 3 analysis continues where it left off
-```
-
-Every checkpoint is atomic (written as temp file, then renamed) to prevent corruption if the process crashes.
-
-## System Requirements
-
-| Component | Requirement |
-|-----------|-------------|
-| GPU | NVIDIA GPU 6GB+ VRAM (RTX 3060, 4060 recommended) |
-| CPU | 8+ core modern processor |
-| RAM | 16GB system RAM minimum |
-| Storage | 500MB-1GB per video (depends on length) |
-| Python | 3.10+ |
-
-## Output
-
-For each input video, the analyzer generates:
-- **Clips** - 1-3 MP4 video clips (15-60 seconds each)
-- **Metadata** - JSON with clip analysis, timing, scoring
-- **Checkpoints** - Full intermediate processing state for recovery
-
-All files are saved to `data/output/` and `data/working/checkpoints/`.
-
-## Performance
-
-Typical performance on RTX 3060 (6GB):
-- 1-hour Insta360 video: ~2-3 hours total (excluding frame extraction)
-- Frame extraction: ~1.5 hours
-- Vision analysis: ~45 minutes
-- Highlight detection: ~5 minutes
-- Encoding: ~5 minutes
-
-## Troubleshooting
-
-### Out of Memory (OOM)
-- Reduce batch size in `config/default_config.yaml`
-- Decrease frame extraction resolution
-
-### GPU Not Detected
-```bash
-python main.py --health-check
-```
-Check CUDA installation and PyTorch GPU support.
-
-### Recovery Not Working
-Check checkpoint integrity:
-```bash
-python main.py --status video_id
-```
-See `logs/errors.log` for detailed error information.
-
-## Development
-
-See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed design patterns and [.claude/CLAUDE.md](.claude/CLAUDE.md) for development standards.
-
-To run tests:
-```bash
-pytest tests/
-```
+🟢 **Production Ready** - All stages implemented, tested, documented
 
 ## License
 
-[Your License Here]
+MIT
 
-## Contributing
-
-See [ARCHITECTURE.md](ARCHITECTURE.md) for development guidelines.
-
-## Support
-
-- Check `logs/errors.log` for error details
-- Review checkpoints in `data/working/checkpoints/` for state inspection
-- See ARCHITECTURE.md troubleshooting section
