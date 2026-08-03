@@ -1,3 +1,0 @@
-file 'C:\Users\swamx\OneDrive\Pictures\Insta360-Analyzer\data\working\file_VID_20250727_171002_00_044_1753650615010000000_clips\clip_000.mp4'
-file 'C:\Users\swamx\OneDrive\Pictures\Insta360-Analyzer\data\working\file_VID_20250727_171002_00_044_1753650615010000000_clips\clip_001.mp4'
-file 'C:\Users\swamx\OneDrive\Pictures\Insta360-Analyzer\data\working\file_VID_20250727_171002_00_044_1753650615010000000_clips\clip_002.mp4'
