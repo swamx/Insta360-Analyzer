@@ -80,7 +80,7 @@ class Stage4ReelAssembly(Stage):
         scored_scenes_checkpoint: Dict[str, Any],
         resume_from: Optional[int] = None,
     ) -> StageResult:
-        """Assemble optimal 15-second reel."""
+        """Assemble optimal reel with clip length optimization."""
         self._log_stage_start(file_id)
 
         try:
@@ -112,8 +112,13 @@ class Stage4ReelAssembly(Stage):
 
             logger.info(f"[{file_id}] Assembling reel from {len(usable_scenes)} usable scenes")
 
-            # Create reel plan
-            reel_plan = self._assemble_reel(usable_scenes)
+            # Optimize clip length if unlimited duration
+            if self.max_duration_seconds <= 0:
+                logger.info(f"[{file_id}] Running clip length optimization (5-30s)...")
+                reel_plan = self._optimize_clip_length(usable_scenes, file_id)
+            else:
+                # Create reel plan with fixed duration
+                reel_plan = self._assemble_reel(usable_scenes)
 
             if not reel_plan.get("clips"):
                 return StageResult(
@@ -137,6 +142,7 @@ class Stage4ReelAssembly(Stage):
                 "reel_plan": reel_plan,
                 "total_duration_seconds": total_duration,
                 "clips_selected": len(reel_plan.get("clips", [])),
+                "optimization": reel_plan.get("optimization"),
                 "timestamp": datetime.utcnow().isoformat() + "Z",
             }
 
@@ -155,14 +161,22 @@ class Stage4ReelAssembly(Stage):
             self.checkpoint_manager.save_file_metadata(file_id, metadata)
 
             self._log_stage_complete(file_id)
+
+            # Build message with optimization info if available
+            message = f"Assembled {len(reel_plan.get('clips', []))} clips into {total_duration:.1f}s reel"
+            if reel_plan.get("optimization"):
+                opt = reel_plan["optimization"]
+                message += f" (optimized: {opt.get('optimal_duration', 0):.1f}s clips, score={opt.get('quality_score', 0):.2f})"
+
             return StageResult(
                 success=True,
                 stage_name=self.stage_name,
                 file_id=file_id,
-                message=f"Assembled {len(reel_plan.get('clips', []))} clips into {total_duration:.1f}s reel",
+                message=message,
                 data={
                     "clip_count": len(reel_plan.get("clips", [])),
                     "total_duration": total_duration,
+                    "optimization": reel_plan.get("optimization"),
                 },
             )
 
@@ -272,6 +286,101 @@ Respond with ONLY the JSON, no other text."""
         except Exception as e:
             logger.warning(f"LLM assembly error: {str(e)}")
             return self._default_reel_plan(scenes)
+
+    def _optimize_clip_length(
+        self, scenes: List[Dict[str, Any]], file_id: str
+    ) -> Dict[str, Any]:
+        """Optimize clip length by testing 5-30 second ranges."""
+        logger.info(f"[{file_id}] Testing clip durations from 5-30 seconds...")
+
+        test_durations = [5.0, 8.0, 10.0, 15.0, 20.0, 25.0, 30.0]
+        best_plan = None
+        best_score = 0.0
+
+        for duration in test_durations:
+            # Create plan with this duration
+            plan = self._create_reel_with_duration(scenes, duration)
+
+            if not plan.get("clips"):
+                continue
+
+            # Score this plan based on:
+            # 1. Scene quality (average of selected scenes)
+            # 2. Clip count (more scenes = more variety)
+            # 3. Duration utilization (fill the reel well)
+
+            scene_scores = [c.get("score", 5.0) for c in plan.get("clips", [])]
+            avg_scene_score = sum(scene_scores) / len(scene_scores) if scene_scores else 0
+
+            # Quality components
+            quality_score = avg_scene_score  # Base: average scene quality
+            quality_score += len(plan.get("clips", [])) * 0.2  # Bonus: more clips
+            quality_score += (plan.get("total_duration", 0) / 30.0) * 0.5  # Bonus: reel fullness
+
+            logger.debug(
+                f"[{file_id}] Duration {duration}s: "
+                f"clips={len(plan.get('clips', []))}, "
+                f"total={plan.get('total_duration', 0):.1f}s, "
+                f"score={quality_score:.2f}"
+            )
+
+            if quality_score > best_score:
+                best_score = quality_score
+                best_plan = plan
+                logger.info(
+                    f"[{file_id}] New best duration: {duration}s (score={quality_score:.2f})"
+                )
+
+        if best_plan:
+            best_plan["optimization"] = {
+                "method": "clip_length_optimization",
+                "tested_durations": test_durations,
+                "optimal_duration": best_plan.get("clip_duration", 5.0),
+                "quality_score": best_score,
+            }
+            return best_plan
+        else:
+            # Fallback to default
+            logger.warning(f"[{file_id}] Optimization failed, using default plan")
+            return self._default_reel_plan(scenes)
+
+    def _create_reel_with_duration(
+        self, scenes: List[Dict[str, Any]], clip_duration_seconds: float
+    ) -> Dict[str, Any]:
+        """Create a reel plan with a specific clip duration."""
+        clips = []
+        total_duration = 0.0
+        max_reel_duration = 300.0  # Max 5 minutes for unlimited
+
+        for scene in scenes[:15]:  # Use top 15 scenes for optimization
+            # Use exactly this clip duration (or less if scene is shorter)
+            scene_duration = scene.get("duration_seconds", 5.0)
+            actual_clip_duration = min(scene_duration, clip_duration_seconds)
+
+            # Check if adding this clip exceeds max
+            if total_duration + actual_clip_duration > max_reel_duration:
+                break
+
+            start_ms = scene.get("start_time_ms", 0)
+            end_ms = int(start_ms + actual_clip_duration * 1000)
+
+            if end_ms > start_ms:  # Valid timing
+                clips.append({
+                    "scene_id": scene.get("scene_id"),
+                    "start_ms": int(start_ms),
+                    "end_ms": int(end_ms),
+                    "clip_duration": actual_clip_duration,
+                    "score": scene.get("overall_score", 5.0),
+                })
+                total_duration += actual_clip_duration
+
+        return {
+            "total_duration": total_duration,
+            "clip_duration": clip_duration_seconds,
+            "reasoning": f"Optimized {len(clips)} clips at {clip_duration_seconds}s each, "
+                        f"total {total_duration:.1f}s",
+            "clips": clips,
+        }
 
     def _default_reel_plan(self, scenes: List[Dict[str, Any]]) -> Dict[str, Any]:
         """Create reel plan using heuristic approach."""
