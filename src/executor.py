@@ -2,6 +2,7 @@
 
 import json
 from pathlib import Path
+from typing import Dict, List, Optional, Any
 from datetime import datetime
 
 from src.utils.logger import get_logger, setup_logging
@@ -64,7 +65,7 @@ class ReelExecutor:
 
         self.results = {}
 
-    def run(self) -> Dict[str, any]:
+    def run(self) -> Dict[str, Any]:
         """Execute complete pipeline."""
         logger.info("=" * 80)
         logger.info("REEL GENERATION PIPELINE")
@@ -99,7 +100,7 @@ class ReelExecutor:
                 "error": str(e),
             }
 
-    def _run_analytics_pipeline(self) -> Dict[str, any]:
+    def _run_analytics_pipeline(self) -> Dict[str, Any]:
         """Run main analytics pipeline."""
         logger.info(f"Input video: {self.video_path}")
         logger.info(f"Video exists: {self.video_path.exists()}")
