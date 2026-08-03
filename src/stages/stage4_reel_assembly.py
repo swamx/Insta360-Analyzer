@@ -278,16 +278,19 @@ Respond with ONLY the JSON, no other text."""
         clips = []
         total_duration = 0.0
 
+        # Handle max_duration: 0 means unlimited, >0 means limit
+        max_duration = self.max_duration_seconds if self.max_duration_seconds > 0 else float('inf')
+
         # Use top scenes in order, limiting each to 3 seconds
         for scene in scenes[:10]:  # Use top 10 scenes
             scene_duration = scene.get("duration_seconds", 5.0)
             clip_duration = min(scene_duration, 3.0)  # Max 3 seconds per clip
 
-            # Check if adding this clip exceeds 15 seconds
-            if total_duration + clip_duration > self.max_duration_seconds:
+            # Check if adding this clip exceeds limit
+            if max_duration != float('inf') and total_duration + clip_duration > max_duration:
                 # Trim last clip to fit
-                clip_duration = self.max_duration_seconds - total_duration
-                total_duration = self.max_duration_seconds
+                clip_duration = max_duration - total_duration
+                total_duration = max_duration
             else:
                 total_duration += clip_duration
 
@@ -312,7 +315,7 @@ Respond with ONLY the JSON, no other text."""
                 "score": scene.get("overall_score", 5.0),
             })
 
-            if total_duration >= self.max_duration_seconds - 0.1:
+            if max_duration != float('inf') and total_duration >= max_duration - 0.1:
                 break
 
         if not clips:
@@ -321,7 +324,11 @@ Respond with ONLY the JSON, no other text."""
                 scene = scenes[0]
                 start_ms = scene.get("start_time_ms", 0)
                 scene_duration = scene.get("duration_seconds", 5.0)
-                clip_duration = min(scene_duration, self.max_duration_seconds)
+                # Use min of scene duration and max_duration (unless unlimited)
+                if max_duration == float('inf'):
+                    clip_duration = scene_duration
+                else:
+                    clip_duration = min(scene_duration, max_duration)
                 end_ms = int(start_ms + clip_duration * 1000)
                 clips = [{
                     "scene_id": scene.get("scene_id"),
