@@ -68,11 +68,29 @@ class Stage5Encoding(Stage):
                 clip_info = clips[idx]
                 output_path = temp_clips_dir / f"clip_{idx:03d}.mp4"
 
+                # Validate clip timing
+                start_s = clip_info.get("start_ms", 0) / 1000.0
+                end_s = clip_info.get("end_ms", 0) / 1000.0
+
+                if end_s <= start_s:
+                    logger.warning(
+                        f"[{file_id}] Invalid clip {idx} timing: "
+                        f"start={start_s}s, end={end_s}s. Skipping."
+                    )
+                    continue
+
+                if end_s - start_s < 0.1:  # Less than 100ms
+                    logger.warning(
+                        f"[{file_id}] Clip {idx} too short: "
+                        f"{end_s - start_s:.2f}s. Skipping."
+                    )
+                    continue
+
                 success = self._extract_clip(
                     source_video,
                     output_path,
-                    clip_info.get("start_ms", 0) / 1000.0,
-                    clip_info.get("end_ms", 0) / 1000.0,
+                    start_s,
+                    end_s,
                 )
 
                 if success and output_path.exists():

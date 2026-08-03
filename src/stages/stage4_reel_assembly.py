@@ -291,8 +291,18 @@ Respond with ONLY the JSON, no other text."""
             else:
                 total_duration += clip_duration
 
+            # Get start time from scene (must have start_time_ms from stage 2)
             start_ms = scene.get("start_time_ms", 0)
             end_ms = int(start_ms + clip_duration * 1000)
+
+            # Validate clip timing (end must be > start)
+            if end_ms <= start_ms:
+                logger.warning(
+                    f"Invalid clip timing for {scene.get('scene_id')}: "
+                    f"start_ms={start_ms}, end_ms={end_ms}. Skipping."
+                )
+                total_duration -= clip_duration  # Remove from total
+                continue
 
             clips.append({
                 "scene_id": scene.get("scene_id"),
@@ -304,6 +314,23 @@ Respond with ONLY the JSON, no other text."""
 
             if total_duration >= self.max_duration_seconds - 0.1:
                 break
+
+        if not clips:
+            logger.warning("No valid clips generated, using fallback single-scene plan")
+            if scenes:
+                scene = scenes[0]
+                start_ms = scene.get("start_time_ms", 0)
+                scene_duration = scene.get("duration_seconds", 5.0)
+                clip_duration = min(scene_duration, self.max_duration_seconds)
+                end_ms = int(start_ms + clip_duration * 1000)
+                clips = [{
+                    "scene_id": scene.get("scene_id"),
+                    "start_ms": int(start_ms),
+                    "end_ms": int(end_ms),
+                    "clip_duration": clip_duration,
+                    "score": scene.get("overall_score", 5.0),
+                }]
+                total_duration = clip_duration
 
         return {
             "total_duration": total_duration,
