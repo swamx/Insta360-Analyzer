@@ -36,7 +36,7 @@ class Insta360Detector:
         """Detect if video is 360-degree format.
 
         Returns:
-            "equirectangular" if 360°, "perspective" if single-view, None if unknown
+            "360" if 360° (any format), "perspective" if single-view, None if unknown
         """
         try:
             # Use ffprobe to get video metadata
@@ -63,17 +63,29 @@ class Insta360Detector:
             width = stream.get("width", 0)
             height = stream.get("height", 0)
 
-            # 360° videos typically have 2:1 aspect ratio (equirectangular)
+            # First check: Is this an Insta360 file?
+            # Insta360 files (.insv, .insp, .lrv) are always 360° content
+            if Insta360Detector.is_insta360_format(file_path):
+                logger.info(f"Detected Insta360 format ({width}×{height}) - requires conversion")
+                return "360"
+
+            # Second check: Aspect ratio hints
             if width > 0 and height > 0:
                 aspect_ratio = width / height
 
-                # Equirectangular projection is roughly 2:1
+                # Equirectangular is roughly 2:1
                 if 1.9 < aspect_ratio < 2.1:
                     logger.info(f"Detected equirectangular 360° video ({width}×{height})")
-                    return "equirectangular"
-                else:
-                    logger.info(f"Detected perspective video ({width}×{height}, aspect={aspect_ratio:.2f})")
-                    return "perspective"
+                    return "360"
+
+                # Square videos (1:1) with high resolution could be dual-fisheye Insta360
+                if 0.95 < aspect_ratio < 1.05 and width >= 2560:
+                    logger.info(f"Detected dual-fisheye 360° video ({width}×{height})")
+                    return "360"
+
+                # Otherwise assume perspective/single-view
+                logger.info(f"Detected perspective video ({width}×{height}, aspect={aspect_ratio:.2f})")
+                return "perspective"
 
             return None
 
@@ -101,9 +113,11 @@ class Insta360Detector:
 
             data = json.loads(result.stdout)
 
+            projection = Insta360Detector.detect_360_projection(file_path)
             metadata = {
                 "is_insta360": Insta360Detector.is_insta360_format(file_path),
-                "projection": Insta360Detector.detect_360_projection(file_path),
+                "projection": projection,
+                "is_360": projection == "360",
                 "format": data.get("format", {}).get("format_name", "unknown"),
                 "duration": float(data.get("format", {}).get("duration", 0)),
                 "bit_rate": int(data.get("format", {}).get("bit_rate", 0)),
@@ -135,5 +149,6 @@ class Insta360Detector:
     @staticmethod
     def needs_conversion(file_path: Path) -> bool:
         """Check if file needs 360→single-view conversion."""
-        metadata = Insta360Detector.get_insta360_metadata(file_path)
-        return metadata.get("projection") == "equirectangular"
+        # Any 360° format needs conversion to single-perspective
+        projection = Insta360Detector.detect_360_projection(file_path)
+        return projection == "360"
