@@ -112,7 +112,11 @@ class Stage5Encoding(Stage):
                         file_id, self.stage_name, checkpoint_data
                     )
                 else:
-                    logger.warning(f"[{file_id}] Failed to extract clip {idx}")
+                    logger.warning(
+                        f"[{file_id}] Failed to extract clip {idx} "
+                        f"({start_s:.1f}s-{end_s:.1f}s, duration={(end_s-start_s):.1f}s, "
+                        f"exists={output_path.exists()})"
+                    )
 
                 self._log_progress(file_id, len(extracted_clips), len(clips))
 
