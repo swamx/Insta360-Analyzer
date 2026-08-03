@@ -5,7 +5,6 @@ from typing import Optional
 
 from src.utils.logger import get_logger, ContextualLogger
 from src.storage.checkpoint_manager import CheckpointManager
-from src.recovery import RecoveryManager
 from src.stages.stage0_insta360_conversion import Stage0Insta360Conversion
 from src.stages.stage1_discovery import Stage1Discovery
 from src.stages.stage2_scene_detection import Stage2SceneDetection
@@ -39,7 +38,6 @@ class Pipeline:
 
         # Initialize managers
         self.checkpoint_manager = CheckpointManager(self.checkpoint_dir)
-        self.recovery_manager = RecoveryManager(self.checkpoint_manager)
 
         # Initialize stages
         self.stage0 = None  # Initialized per-file since it needs video_path
@@ -87,17 +85,28 @@ class Pipeline:
 
         try:
             # Determine recovery point if resuming
-            recovery_state = None
+            next_stage_to_run = 0
             if resume:
-                recovery_state = self.recovery_manager.scan_file_state(file_id)
-                ctx_logger.info(
-                    f"Resume mode: last_complete_stage={recovery_state.last_complete_stage}, "
-                    f"next_to_run={recovery_state.next_stage_to_run}"
-                )
+                metadata = self.checkpoint_manager.load_file_metadata(file_id)
+                if metadata:
+                    state = metadata.get("state", "UNKNOWN")
+                    # Map state to next stage
+                    state_to_stage = {
+                        "UNKNOWN": 0,
+                        "CREATED": 0,
+                        "CONVERTED": 0,
+                        "DISCOVERED": 1,
+                        "SCENES_DETECTED": 2,
+                        "ANALYZED": 3,
+                        "REEL_ASSEMBLED": 4,
+                        "COMPLETED": 5,
+                    }
+                    next_stage_to_run = state_to_stage.get(state, 0)
+                    ctx_logger.info(f"Resume mode: state={state}, next_stage={next_stage_to_run}")
 
             # Stage 0.5: Insta360 Conversion
             processed_input_path = input_path
-            if not resume or recovery_state.next_stage_to_run <= -1:
+            if not resume or next_stage_to_run <= -1:
                 ctx_logger.info("Running Stage 0.5: Insta360 Conversion")
                 self.stage0 = Stage0Insta360Conversion(input_path, self.working_dir)
                 result = self.stage0.run()
@@ -116,7 +125,7 @@ class Pipeline:
                 results["stages"]["stage0_insta360_conversion"] = {"success": True, "skipped": True}
 
             # Stage 1: Discovery
-            if not resume or recovery_state.next_stage_to_run <= 0:
+            if not resume or next_stage_to_run <= 0:
                 ctx_logger.info("Running Stage 1: Discovery")
                 result = self.stage1.run(file_id, processed_input_path)
                 results["stages"]["stage1_discovery"] = {
@@ -131,7 +140,7 @@ class Pipeline:
                 results["stages"]["stage1_discovery"] = {"success": True, "skipped": True}
 
             # Stage 2: Scene Detection
-            if not resume or recovery_state.next_stage_to_run <= 1:
+            if not resume or next_stage_to_run <= 1:
                 ctx_logger.info("Running Stage 2: Scene Detection")
                 result = self.stage2.run(file_id, processed_input_path)
                 results["stages"]["stage2_scene_detection"] = {
@@ -151,7 +160,7 @@ class Pipeline:
                 stage2_data = {"scene_count": stage2_cp.get("total_scenes", 0)}
 
             # Stage 3: Vision Editor
-            if not resume or recovery_state.next_stage_to_run <= 2:
+            if not resume or next_stage_to_run <= 2:
                 ctx_logger.info("Running Stage 3: Vision Editor")
                 stage2_cp = self.checkpoint_manager.load_file_checkpoint(file_id, "stage2_scene_detection")
                 result = self.stage3.run(file_id, stage2_cp)
@@ -168,7 +177,7 @@ class Pipeline:
                 results["stages"]["stage3_vision_editor"] = {"success": True, "skipped": True}
 
             # Stage 4: Reel Assembly
-            if not resume or recovery_state.next_stage_to_run <= 3:
+            if not resume or next_stage_to_run <= 3:
                 ctx_logger.info("Running Stage 4: Reel Assembly")
                 stage3_cp = self.checkpoint_manager.load_file_checkpoint(file_id, "stage3_vision_editor")
                 result = self.stage4.run(file_id, stage3_cp)
@@ -185,7 +194,7 @@ class Pipeline:
                 results["stages"]["stage4_reel_assembly"] = {"success": True, "skipped": True}
 
             # Stage 5: Encoding
-            if not resume or recovery_state.next_stage_to_run <= 4:
+            if not resume or next_stage_to_run <= 4:
                 ctx_logger.info("Running Stage 5: Encoding")
                 stage4_cp = self.checkpoint_manager.load_file_checkpoint(file_id, "stage4_reel_assembly")
                 result = self.stage5.run(file_id, processed_input_path, stage4_cp)
@@ -222,8 +231,8 @@ class Pipeline:
         return {
             "file_id": file_id,
             "status": metadata.get("state", "unknown") if metadata else "unknown",
-            "last_complete_stage": recovery_state.last_complete_stage,
-            "next_stage_to_run": recovery_state.next_stage_to_run,
+            "last_complete_stage": next_stage_to_run,
+            "next_stage_to_run": next_stage_to_run,
             "needs_processing": recovery_state.needs_processing(),
             "metadata": metadata,
         }
