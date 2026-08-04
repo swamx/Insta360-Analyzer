@@ -63,3 +63,7 @@ Thumbs.db
 # Environment
 .env
 .env.local
+*.insv
+data/input/
+data/working/
+logs/

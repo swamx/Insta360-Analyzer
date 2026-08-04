@@ -106,7 +106,7 @@ class Pipeline:
 
             # Stage 0.5: Insta360 Conversion
             processed_input_path = input_path
-            if not resume or next_stage_to_run <= -1:
+            if not resume or next_stage_to_run <= 0:
                 ctx_logger.info("Running Stage 0.5: Insta360 Conversion")
                 self.stage0 = Stage0Insta360Conversion(input_path, self.working_dir)
                 result = self.stage0.run()

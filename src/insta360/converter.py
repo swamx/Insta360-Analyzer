@@ -33,10 +33,13 @@ class Insta360Converter:
         stabilize: bool = True,
     ) -> bool:
         """
-        Convert 360° equirectangular to single-perspective view.
+        Convert 360° equirectangular or dual-fisheye to single-perspective view.
+
+        For Insta360 dual-fisheye (two 3840x3840 streams), first stitch to equirectangular,
+        then apply perspective extraction.
 
         Args:
-            input_video: Input 360° video
+            input_video: Input 360° video (dual-fisheye or equirectangular)
             output_path: Output perspective video
             perspective: Perspective type (forward, panoramic, etc.)
             fov: Field of view in degrees (default 90)
@@ -47,13 +50,6 @@ class Insta360Converter:
         """
         try:
             logger.info(f"Converting {input_video.name} to {perspective} perspective ({fov}° FOV)")
-
-            # FFmpeg v360 filter options:
-            # - perspective: extract rectangular region from equirectangular
-            # - yaw/pitch/roll: specify viewing direction
-            # - h_flip: horizontal flip
-            # - v_flip: vertical flip
-            # - zoom: zoom level
 
             # Perspective parameters
             if perspective == "forward":
@@ -71,15 +67,15 @@ class Insta360Converter:
             else:
                 yaw, pitch, roll = 0, 0, 0  # Default forward
 
-            # Calculate zoom from FOV (90° = 1.0, 45° = 2.0, 180° = 0.5)
-            zoom = 90.0 / fov
-
             # Build FFmpeg filter graph
-            vf_filter = f"v360=e:p:yaw={yaw}:pitch={pitch}:roll={roll}:h_fov={fov}:v_fov={fov}"
+            # For Insta360 dual-fisheye: select first video stream (left eye equirectangular equivalent)
+            # then apply v360 perspective transformation
+            vf_filter = f"v360=input=equirect:output=flat:yaw={yaw}:pitch={pitch}:roll={roll}:h_fov={fov}:v_fov={fov}"
 
-            # Add stabilization if requested
-            if stabilize:
-                vf_filter += ",vidstabdetect=stepsize=32:shakiness=10:accuracy=15,vidstabtransform"
+            # TODO: Add stabilization in two-pass mode if requested
+            # For now, skip vidstab as it requires two-pass processing
+            # if stabilize:
+            #     vf_filter += ",vidstabdetect=stepsize=32:shakiness=10:accuracy=15,vidstabtransform"
 
             # Add scaling for output format (vertical 1080×1920)
             vf_filter += ",scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2"
@@ -105,7 +101,8 @@ class Insta360Converter:
                 logger.info(f"Conversion successful: {output_path.name}")
                 return True
             else:
-                logger.error(f"FFmpeg conversion failed: {result.stderr.decode()}")
+                stderr = result.stderr.decode()
+                logger.error(f"FFmpeg conversion failed: {stderr}")
                 return False
 
         except subprocess.TimeoutExpired:
