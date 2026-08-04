@@ -429,19 +429,33 @@ CRITICAL: Return ONLY valid JSON, nothing else. No markdown, no code blocks, jus
 
     @staticmethod
     def _mock_score(scene: Dict[str, Any]) -> Dict[str, Any]:
-        """Generate deterministic mock score from scene index."""
+        """Generate varied mock score based on frame analysis metrics."""
         scene_idx = scene.get("scene_idx", 0)
+        duration = scene.get("duration_seconds", 5.0)
 
-        # Deterministic scoring based on scene index
-        base_score = 5.0 + (scene_idx % 5) * 0.8
+        # Use frame metrics if available for more realistic scoring
+        brightness = scene.get("avg_brightness", 128.0)
+        motion = scene.get("motion_score", 5.0)
+
+        # Score based on actual metrics, not cyclic pattern
+        # Prefer scenes with: good brightness (80-180), some motion, reasonable duration
+        brightness_score = 10 - abs(brightness - 128.0) / 20.0  # Peak at 128
+        duration_score = min(10, (duration / 5.0) * 8.0)  # Prefer 5+ second scenes
+
+        # Add some variation to avoid selecting same scenes
+        variation = 2.0 * np.sin(scene_idx * 0.5) if scene_idx > 0 else 0.0
+
+        base_score = min(10, max(3.0,
+            (brightness_score * 0.3 + duration_score * 0.3 + motion * 0.4 + variation)
+        ))
 
         return {
-            "scenic_beauty": min(10, 5 + (scene_idx % 3)),
-            "action": min(10, 4 + (scene_idx % 4)),
-            "emotion": min(10, 6 + (scene_idx % 3)),
-            "stability": min(10, 7 + (scene_idx % 2)),
-            "blurriness": min(10, 8 + (scene_idx % 2)),
-            "brief_description": f"Scene with index {scene_idx}",
+            "scenic_beauty": min(10, max(3, int(brightness_score * 1.2))),
+            "action": min(10, max(3, int(motion * 1.5))),
+            "emotion": min(10, max(3, int(duration_score))),
+            "stability": min(10, 6 + (scene_idx % 3)),
+            "blurriness": min(10, 7 + (scene_idx % 2)),
+            "brief_description": f"Scene with varied metrics (duration={duration:.1f}s)",
             "is_usable": True,
             "overall_score": base_score,
         }
