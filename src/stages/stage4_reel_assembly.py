@@ -383,15 +383,35 @@ Respond with ONLY the JSON, no other text."""
         }
 
     def _default_reel_plan(self, scenes: List[Dict[str, Any]]) -> Dict[str, Any]:
-        """Create reel plan using heuristic approach."""
+        """Create reel plan with scene diversity checking."""
         clips = []
         total_duration = 0.0
+        selected_scene_ids = set()
 
         # Handle max_duration: 0 means unlimited, >0 means limit
         max_duration = self.max_duration_seconds if self.max_duration_seconds > 0 else float('inf')
 
-        # Use top scenes in order, limiting each to 3 seconds
-        for scene in scenes[:10]:  # Use top 10 scenes
+        # Use top scenes with diversity checking
+        min_temporal_distance_ms = 15000  # Prefer scenes at least 15s apart
+
+        for scene in scenes[:15]:  # Use top 15 scenes for better selection
+            scene_id = scene.get("scene_id")
+            start_ms = scene.get("start_time_ms", 0)
+
+            # Diversity check: ensure clips are temporally spread out
+            if clips:  # Only check if we already have clips
+                # Check distance from last selected scene
+                last_start = clips[-1].get("start_ms", 0)
+                temporal_distance = abs(start_ms - last_start)
+
+                # Skip if too close to previous scene (likely similar content)
+                if temporal_distance < min_temporal_distance_ms:
+                    logger.debug(
+                        f"Skipping scene {scene_id} - too close to previous "
+                        f"({temporal_distance}ms < {min_temporal_distance_ms}ms)"
+                    )
+                    continue
+
             scene_duration = scene.get("duration_seconds", 5.0)
             clip_duration = min(scene_duration, 3.0)  # Max 3 seconds per clip
 
@@ -404,20 +424,19 @@ Respond with ONLY the JSON, no other text."""
                 total_duration += clip_duration
 
             # Get start time from scene (must have start_time_ms from stage 2)
-            start_ms = scene.get("start_time_ms", 0)
             end_ms = int(start_ms + clip_duration * 1000)
 
             # Validate clip timing (end must be > start)
             if end_ms <= start_ms:
                 logger.warning(
-                    f"Invalid clip timing for {scene.get('scene_id')}: "
+                    f"Invalid clip timing for {scene_id}: "
                     f"start_ms={start_ms}, end_ms={end_ms}. Skipping."
                 )
                 total_duration -= clip_duration  # Remove from total
                 continue
 
             clips.append({
-                "scene_id": scene.get("scene_id"),
+                "scene_id": scene_id,
                 "start_ms": int(start_ms),
                 "end_ms": int(end_ms),
                 "clip_duration": clip_duration,

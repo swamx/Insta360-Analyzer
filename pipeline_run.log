@@ -1,4 +1,4 @@
-2026-08-04 17:44:47.508861: I tensorflow/core/util/port.cc:113] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2026-08-04 18:07:48.274773: I tensorflow/core/util/port.cc:113] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
 AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
 AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
 AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
@@ -15,8 +15,36 @@ INFO - ============================================================
 INFO - [file_VID_20250727_155027_00_025_1785861992444600000] Starting processing (resume=False)
 INFO - [file_VID_20250727_155027_00_025_1785861992444600000] Running Stage 0.5: Insta360 Conversion
 INFO - Stage 0.5: Insta360 Conversion - Processing VID_20250727_155027_00_025.insv
-INFO - Checkpoint loaded successfully
-INFO - Loading from checkpoint
+INFO - Detected Insta360 format (2880×2880) - requires conversion
+INFO - Insta360 metadata: {
+  "is_insta360": true,
+  "projection": "360",
+  "is_360": true,
+  "format": "mov,mp4,m4a,3gp,3g2,mj2",
+  "duration": 387.320267,
+  "bit_rate": 75124794,
+  "width": 2880,
+  "height": 2880,
+  "fps": 29.97002997002997,
+  "codec": "hevc",
+  "camera_make": "unknown",
+  "camera_model": "unknown"
+}
+INFO - Detected Insta360 format (2880×2880) - requires conversion
+INFO - Analyzing 360° video for optimal perspective...
+INFO - Selecting perspective for VID_20250727_155027_00_025.insv
+INFO - Selected perspective: forward (score=7.6) - Primary shooting direction - most content
+INFO - [stage0_insta360_conversion] perspective_selection: forward (confidence=0.76, scene=VID_20250727_155027_00_025)
+INFO - Converting 360° to forward perspective...
+INFO - Converting VID_20250727_155027_00_025.insv to forward perspective (90° FOV)
+INFO - Conversion successful: VID_20250727_155027_00_025_converted.mp4
+INFO - Conversion successful: VID_20250727_155027_00_025_converted.mp4
+INFO - Output size: 445.30MB
+INFO - Perspective: forward (score: 7.6/10)
+INFO - [stage0_insta360_conversion] 360_conversion: conversion_successful (confidence=0.76, scene=VID_20250727_155027_00_025)
+INFO - Traceability report saved: data\working\stage0_insta360_conversion\VID_20250727_155027_00_025_traceability_report.json
+INFO - Markdown report saved: data\working\stage0_insta360_conversion\VID_20250727_155027_00_025_traceability_report.md
+INFO - Checkpoint saved: data\working\stage0_insta360_conversion\checkpoint.json
 INFO - [file_VID_20250727_155027_00_025_1785861992444600000] Stage 0.5 complete: was_360=True, converted=True
 INFO - [file_VID_20250727_155027_00_025_1785861992444600000] Running Stage 1: Discovery
 INFO - [file_VID_20250727_155027_00_025_1785861992444600000] Starting stage1_discovery
